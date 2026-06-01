@@ -74,8 +74,3 @@ O backend é construído em Java e é o coração do sistema, lidando com segura
 
 ---
 
-## 💡 Observações para o Versionamento (GitHub)
-
-Lembre-se de não subir pastas pesadas ou arquivos compilados.
-- **Frontend:** A pasta `node_modules` e arquivos de ambiente (`.env`) já devem constar no `.gitignore`.
-- **Backend:** A pasta `target/` e as configurações da IDE (como `.vscode` ou `.idea`) também devem ser ignoradas.
