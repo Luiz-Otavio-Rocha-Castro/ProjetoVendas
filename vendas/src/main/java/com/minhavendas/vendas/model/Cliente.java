@@ -13,6 +13,8 @@ public class Cliente {
     private Integer id;
     
     private String nome;
+
+    private String cpf;
     
     private String telefone;
     
@@ -50,6 +52,14 @@ public class Cliente {
 
     public void setEndereco(String endereco) {
         this.endereco = endereco;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
     //#endregion
 

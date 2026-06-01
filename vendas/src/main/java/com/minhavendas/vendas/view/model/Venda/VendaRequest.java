@@ -4,16 +4,18 @@ package com.minhavendas.vendas.view.model.Venda;
 public class VendaRequest {
     //#region
     private String produto;
+
+    private Integer quantidadePainel;
+
+    private String status;
     
+    private Double saldoDevedor;
+
     private Double valorTotal;
     
     private Double percentualComissao;
     
     private String formaPagamento;
-    
-    private Integer clienteIdentificador;
-
-    private Integer vendedorIdentificador;
 
     //#endregion
 
@@ -49,20 +51,29 @@ public class VendaRequest {
     public void setFormaPagamento(String formaPagamento) {
         this.formaPagamento = formaPagamento;
     }
-       public Integer getClienteIdentificador() {
-        return clienteIdentificador;
+
+    public Integer getQuantidadePainel() {
+        return quantidadePainel;
     }
 
-    public void setClienteIdentificador(Integer clienteId) {
-        this.clienteIdentificador = clienteId;
+    public void setQuantidadePainel(Integer quantidadePainel) {
+        this.quantidadePainel = quantidadePainel;
     }
 
-    public Integer getVendedorIdentificador() {
-        return vendedorIdentificador;
+    public String getStatus() {
+        return status;
     }
 
-    public void setVendedorIdentificador(Integer vendedorId) {
-        this.vendedorIdentificador = vendedorId;
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Double getSaldoDevedor() {
+        return saldoDevedor;
+    }
+
+    public void setSaldoDevedor(Double saldoDevedor) {
+        this.saldoDevedor = saldoDevedor;
     }
 
     //#endregion

@@ -7,7 +7,13 @@ public class VendaResponse {
     private Integer id;
 
     private String produto;
+
+    private Integer quantidadePainel;
+
+    private String status;
     
+    private Double saldoDevedor;
+
     private LocalDate dataVenda;
     
     private Double valorTotal;
@@ -19,8 +25,6 @@ public class VendaResponse {
     private String formaPagamento;
     
     private String clienteNome;
-
-    private String vendedorNome;
 
     //#endregion
 
@@ -89,12 +93,28 @@ public class VendaResponse {
         this.clienteNome = clienteNome;
     }
 
-    public String getVendedorNome() {
-        return vendedorNome;
+    public Integer getQuantidadePainel() {
+        return quantidadePainel;
     }
 
-    public void setVendedorNome(String vendedorNome) {
-        this.vendedorNome = vendedorNome;
+    public void setQuantidadePainel(Integer quantidadePainel) {
+        this.quantidadePainel = quantidadePainel;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Double getSaldoDevedor() {
+        return saldoDevedor;
+    }
+
+    public void setSaldoDevedor(Double saldoDevedor) {
+        this.saldoDevedor = saldoDevedor;
     }
 
     //#endregion

@@ -5,6 +5,8 @@ public class ClienteResponse {
     
     private String nome;
     
+    private String cpf; 
+
     private String telefone;
     
     private String endereco;
@@ -41,5 +43,13 @@ public class ClienteResponse {
 
     public void setEndereco(String endereco) {
         this.endereco = endereco;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
 }

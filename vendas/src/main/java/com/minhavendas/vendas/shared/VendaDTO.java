@@ -10,6 +10,12 @@ public class VendaDTO {
     private Integer id;
 
     private String produto;
+
+    private Integer quantidadePainel;
+
+    private String status;
+    
+    private Double saldoDevedor;
     
     private LocalDate dataVenda;
     
@@ -97,6 +103,30 @@ public class VendaDTO {
 
     public void setVendedor(Vendedor vendedor) {
         this.vendedor = vendedor;
+    }
+
+    public Integer getQuantidadePainel() {
+        return quantidadePainel;
+    }
+
+    public void setQuantidadePainel(Integer quantidadePainel) {
+        this.quantidadePainel = quantidadePainel;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Double getSaldoDevedor() {
+        return saldoDevedor;
+    }
+
+    public void setSaldoDevedor(Double saldoDevedor) {
+        this.saldoDevedor = saldoDevedor;
     }
 
     //#endregion

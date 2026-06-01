@@ -1,8 +1,21 @@
-import { useState, useCallback, useMemo } from 'react'
-import { mockContratos, type Contrato, type ContratoStatus } from '../features/vendas/mockVendas'
+import { useState, useCallback, useMemo, useEffect } from 'react'
+import { type Contrato, type ContratoStatus } from '../features/vendas/mockVendas'
+import { obterVendas, cadastrarVenda } from '../services/vendas/vendaService'
+
 
 export function useVendas() {
-  const [contratos, setContratos] = useState<Contrato[]>(mockContratos)
+  const [contratos, setContratos] = useState<Contrato[]>([])
+    useEffect(() => {
+    // Busca os dados da sua API do Spring Boot
+    obterVendas()
+      .then((dadosReais) => {
+        setContratos(dadosReais) // Coloca os dados reais no estado
+      })
+      .catch((erro) => {
+        console.error("Erro ao carregar contratos do backend:", erro)
+      })
+  }, []) // Executa uma única vez ao abrir
+
   const [busca, setBusca] = useState('')
   const [filtroStatus, setFiltroStatus] = useState<ContratoStatus | 'Todos'>('Todos')
   const [pagina, setPagina] = useState(1)
@@ -13,7 +26,8 @@ export function useVendas() {
       const matchBusca =
         busca === '' ||
         c.cliente.toLowerCase().includes(busca.toLowerCase()) ||
-        c.id.toLowerCase().includes(busca.toLowerCase())
+        c.id.toLowerCase().includes(busca.toLowerCase()) ||
+        c.produto.toLowerCase().includes(busca.toLowerCase())
       const matchStatus = filtroStatus === 'Todos' || c.status === filtroStatus
       return matchBusca && matchStatus
     })
@@ -26,14 +40,45 @@ export function useVendas() {
     paginaAtual * itensPorPagina
   )
 
-  const adicionarContrato = useCallback((dados: Omit<Contrato, 'id' | 'dataCriacao'>) => {
-    const novo: Contrato = {
-      ...dados,
-      id: `CT-${String(Date.now()).slice(-5)}`,
-      dataCriacao: new Date().toISOString().split('T')[0],
+  // Métricas gerais (sobre TODOS os contratos, não só os filtrados)
+  const totalVendas = useMemo(
+    () => contratos.reduce((s, c) => s + c.valorTotal, 0),
+    [contratos]
+  )
+  const totalComissao = useMemo(
+    () => contratos.reduce((s, c) => s + c.comissao, 0),
+    [contratos]
+  )
+  const contratosPendentes = useMemo(
+    () => contratos.filter((c) => c.status === 'Pendente'),
+    [contratos]
+  )
+  const totalSaldoDevedor = useMemo(
+    () => contratosPendentes.reduce((s, c) => s + c.saldoDevedor, 0),
+    [contratosPendentes]
+  )
+
+  const adicionarContrato = useCallback(async (dados: Omit<Contrato, 'id' | 'dataCriacao'>) => {
+    try {
+      // Chama o service para cadastrar no backend
+      const novo = await cadastrarVenda(dados)
+      // Atualiza o estado com o contrato que retornou do backend (com ID real)
+      setContratos((prev) => [novo, ...prev])
+      setPagina(1)
+    } catch (erro) {
+      console.error("Erro ao cadastrar contrato no backend:", erro)
+      alert("Falha ao salvar a venda no sistema.")
     }
-    setContratos((prev) => [novo, ...prev])
-    setPagina(1)
+  }, [])
+
+  const removerContrato = useCallback((id: string) => {
+    setContratos((prev) => prev.filter((c) => c.id !== id))
+  }, [])
+
+  const editarContrato = useCallback((id: string, dados: Omit<Contrato, 'id' | 'dataCriacao'>) => {
+    setContratos((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, ...dados } : c))
+    )
   }, [])
 
   return {
@@ -48,6 +93,12 @@ export function useVendas() {
     setPagina,
     totalPaginas,
     adicionarContrato,
+    removerContrato,
+    editarContrato,
     total: filtrados.length,
+    totalVendas,
+    totalComissao,
+    contratosPendentes,
+    totalSaldoDevedor,
   }
 }

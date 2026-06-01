@@ -5,7 +5,7 @@ import LoginPage from './features/auth/LoginPage'
 import AppLayout from './components/ui/AppLayout'
 import DashboardPage from './features/dashboard/DashboardPage'
 import VendasPage from './features/vendas/VendasPage'
-import LeadsPage from './features/leads/LeadsPage'
+import PagamentosPendentesPage from './features/pagamentos/PagamentosPendentesPage'
 import DocumentosPage from './features/documentos/DocumentosPage'
 import PerfilPage from './features/perfil/PerfilPage'
 
@@ -26,7 +26,7 @@ export default function App() {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard"  element={<DashboardPage />} />
           <Route path="vendas"     element={<VendasPage />} />
-          <Route path="leads"      element={<LeadsPage />} />
+          <Route path="pagamentos" element={<PagamentosPendentesPage />} />
           <Route path="documentos" element={<DocumentosPage />} />
           <Route path="perfil"     element={<PerfilPage />} />
         </Route>

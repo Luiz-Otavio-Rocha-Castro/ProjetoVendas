@@ -17,24 +17,26 @@ public class Venda {
     private Integer id;
 
     private String produto;
+
+    private Integer quantidadePainel;
+
+    private String status;
+
+    private Double saldoDevedor;
     
     private LocalDate dataVenda;
     
     private Double valorTotal;
     
     private Double percentualComissao;
-    
+
     private Double ValorComissao;
     
     private String formaPagamento;
     
     @ManyToOne
-    @JoinColumn(name = "vendedor_id")
-    private Cliente cliente;
-
-    @ManyToOne
     @JoinColumn(name = "cliente_id")
-    private Vendedor vendedor;
+    private Cliente cliente;
 
     //#endregion
 
@@ -101,13 +103,29 @@ public class Venda {
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
-
-    public Vendedor getVendedor() {
-        return vendedor;
+    
+    public Integer getQuantidadePainel() {
+        return quantidadePainel;
     }
 
-    public void setVendedor(Vendedor vendedor) {
-        this.vendedor = vendedor;
+    public void setQuantidadePainel(Integer quantidadePainel) {
+        this.quantidadePainel = quantidadePainel;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Double getSaldoDevedor() {
+        return saldoDevedor;
+    }
+
+    public void setSaldoDevedor(Double saldoDevedor) {
+        this.saldoDevedor = saldoDevedor;
     }
 
     //#endregion

@@ -10,7 +10,12 @@ public class VendedorDTO {
 
     private String senha;
 
-    private String telefone;
+    private String regiaoAtuacao;
+
+    private Double metaMensal;
+
+    private Double metaKwp;
+
     //#endregion
 
     //#region GEts e setters
@@ -46,13 +51,31 @@ public class VendedorDTO {
         this.senha = senha;
     }
 
-    public String getTelefone() {
-        return telefone;
+    public String getRegiaoAtuacao() {
+        return regiaoAtuacao;
     }
 
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
+    public void setRegiaoAtuacao(String regiaoAtuacao) {
+        this.regiaoAtuacao = regiaoAtuacao;
     }
+
+    public Double getMetaMensal() {
+        return metaMensal;
+    }
+
+    public void setMetaMensal(Double metaMensal) {
+        this.metaMensal = metaMensal;
+    }
+
+    public Double getMetaKwp() {
+        return metaKwp;
+    }
+
+    public void setMetaKwp(Double metaKwp) {
+        this.metaKwp = metaKwp;
+    }
+
+    
     //#endregion
 
 }

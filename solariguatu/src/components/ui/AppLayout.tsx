@@ -1,23 +1,23 @@
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, FileText, Sun, LogOut,
-  Zap, Bell, Users, FolderOpen, UserCircle,
+  Zap, Bell, AlertCircle, FolderOpen, UserCircle,
 } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import ToastContainer from './Toast'
 
 const navItems = [
-  { to: '/dashboard',   icon: LayoutDashboard, label: 'Dashboard'  },
-  { to: '/vendas',      icon: FileText,         label: 'Contratos'  },
-  { to: '/leads',       icon: Users,            label: 'Leads'      },
-  { to: '/documentos',  icon: FolderOpen,       label: 'Documentos' },
-  { to: '/perfil',      icon: UserCircle,       label: 'Meu Perfil' },
+  { to: '/dashboard',   icon: LayoutDashboard, label: 'Dashboard'       },
+  { to: '/vendas',      icon: FileText,         label: 'Contratos'       },
+  { to: '/pagamentos',  icon: AlertCircle,      label: 'Pag. Pendentes'  },
+  { to: '/documentos',  icon: FolderOpen,       label: 'Documentos'      },
+  { to: '/perfil',      icon: UserCircle,       label: 'Meu Perfil'      },
 ]
 
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard':  'Dashboard',
   '/vendas':     'Contratos',
-  '/leads':      'Pipeline de Leads',
+  '/pagamentos': 'Pagamentos Pendentes',
   '/documentos': 'Documentos',
   '/perfil':     'Meu Perfil',
 }

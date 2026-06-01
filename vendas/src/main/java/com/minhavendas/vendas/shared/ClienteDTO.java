@@ -4,6 +4,8 @@ public class ClienteDTO {
     private Integer id;
     
     private String nome;
+
+    private String cpf;
     
     private String telefone;
     
@@ -41,5 +43,13 @@ public class ClienteDTO {
 
     public void setEndereco(String endereco) {
         this.endereco = endereco;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
 }

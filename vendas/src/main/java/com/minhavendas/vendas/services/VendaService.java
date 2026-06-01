@@ -49,22 +49,17 @@ public class VendaService {
         return vendaDTO;
     }
     
-    public VendaDTO adicionar(VendaDTO vendaDto, Integer clienteId, Integer vendedorId){
+    public VendaDTO adicionar(VendaDTO vendaDto, Integer clienteId){
         Optional<Cliente> cliente = clienteRepository.findById(clienteId);
-        Optional<Vendedor> vendedor = vendedorRepository.findById(vendedorId);
         vendaDto.setId(null);
 
         if(cliente.isEmpty()){
             throw new IllegalArgumentException("Não existe um cliente com esse ID");
         }
-        if(vendedor.isEmpty()){
-            throw new IllegalArgumentException("Não existe um vendedor com esse ID");
-        }
-
         vendaDto.setDataVenda(LocalDate.now());
         vendaDto.setValorComissao(vendaDto.getValorTotal() * (vendaDto.getPercentualComissao()/100));
         vendaDto.setCliente(cliente.get());
-        vendaDto.setVendedor(vendedor.get());
+
         Venda venda = mapper.map(vendaDto, Venda.class);
         venda = vendaRepository.save(venda);
 

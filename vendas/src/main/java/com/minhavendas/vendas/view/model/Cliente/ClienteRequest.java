@@ -3,9 +3,13 @@ package com.minhavendas.vendas.view.model.Cliente;
 public class ClienteRequest {    
     private String nome;
     
+    private String cpf;
+
     private String telefone;
     
     private String endereco;
+
+
     //#endregion
 
     //#region gets e setters
@@ -32,5 +36,12 @@ public class ClienteRequest {
 
     public void setEndereco(String endereco) {
         this.endereco = endereco;
+    }
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
 }

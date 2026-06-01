@@ -51,10 +51,10 @@ public class ClienteController {
 
 
     @PostMapping
-    public ResponseEntity<ClienteResponse> adicionar(@RequestBody ClienteRequest clienteRequest){
+    public ResponseEntity<Integer> adicionar(@RequestBody ClienteRequest clienteRequest){
         ClienteDTO clienteDTO = mapper.map(clienteRequest, ClienteDTO.class);
         clienteDTO = clienteService.adicionar(clienteDTO);
-        return new ResponseEntity<>(mapper.map(clienteDTO, ClienteResponse.class), HttpStatus.CREATED);
+        return new ResponseEntity<>(mapper.map(clienteDTO, ClienteResponse.class).getId(), HttpStatus.CREATED);
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletar(@PathVariable Integer id){

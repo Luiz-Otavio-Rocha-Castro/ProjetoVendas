@@ -16,14 +16,17 @@ export default function Input({ label, error, leftIcon, className = '', style, .
       )}
       <div className="relative">
         {leftIcon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--color-muted)' }}>
+          <div
+            className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center"
+            style={{ color: 'var(--color-muted)', zIndex: 1 }}
+          >
             {leftIcon}
           </div>
         )}
         <input
           {...props}
-          className={`input-base ${leftIcon ? 'pl-10' : ''} ${error ? 'border-[var(--color-danger)]' : ''} ${className}`}
-          style={style}
+          className={`input-base ${leftIcon ? 'pl-9' : ''} ${error ? 'border-[var(--color-danger)]' : ''} ${className}`}
+          style={{ ...(leftIcon ? { paddingLeft: '2.25rem' } : {}), ...style }}
         />
       </div>
       {error && (

@@ -118,6 +118,16 @@ body {
   to   { opacity: 0; transform: translateX(110%); }
 }
 
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes overlayOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
 @keyframes scaleIn {
   from { opacity: 0; transform: scale(0.95); }
   to   { opacity: 1; transform: scale(1); }
@@ -190,7 +200,11 @@ body {
   border: 1px solid var(--color-border);
   color: var(--color-foreground);
   border-radius: 10px;
-  padding: 10px 14px;
+  /* padding-left is intentionally omitted here so Tailwind pl-* utilities work */
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-right: 14px;
+  padding-left: 14px; /* default when no icon; overridden by pl-9/pl-10 utility */
   font-family: var(--font-body);
   font-size: 0.9rem;
   transition: border-color 0.2s, box-shadow 0.2s;
