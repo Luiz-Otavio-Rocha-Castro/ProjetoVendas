@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { type Contrato, type ContratoStatus } from '../features/vendas/mockVendas'
-import { obterVendas, cadastrarVenda } from '../services/vendas/vendaService'
+import { obterVendas, cadastrarVenda, atualizarVenda, deletarVenda } from '../services/vendas/vendaService'
 
 
 export function useVendas() {
@@ -71,14 +71,28 @@ export function useVendas() {
     }
   }, [])
 
-  const removerContrato = useCallback((id: string) => {
-    setContratos((prev) => prev.filter((c) => c.id !== id))
+  const removerContrato = useCallback(async (id: string) => {
+    try {
+      const idNumerico = parseInt(id.replace(/\D/g, ''), 10);
+      await deletarVenda(idNumerico);
+      setContratos((prev) => prev.filter((c) => c.id !== id))
+    } catch (erro) {
+      console.error("Erro ao deletar contrato:", erro);
+      alert("Falha ao deletar a venda.");
+    }
   }, [])
 
-  const editarContrato = useCallback((id: string, dados: Omit<Contrato, 'id' | 'dataCriacao'>) => {
-    setContratos((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, ...dados } : c))
-    )
+  const editarContrato = useCallback(async (id: string, dados: Omit<Contrato, 'id' | 'dataCriacao'>) => {
+    try {
+      const idNumerico = parseInt(id.replace(/\D/g, ''), 10);
+      const atualizado = await atualizarVenda(idNumerico, dados);
+      setContratos((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, ...atualizado } : c))
+      )
+    } catch (erro) {
+      console.error("Erro ao atualizar contrato:", erro);
+      alert("Falha ao atualizar a venda.");
+    }
   }, [])
 
   return {

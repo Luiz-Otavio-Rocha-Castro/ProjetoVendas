@@ -11,10 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.minhavendas.vendas.model.Cliente;
 import com.minhavendas.vendas.model.Venda;
-import com.minhavendas.vendas.model.Vendedor;
 import com.minhavendas.vendas.repository.ClienteRepository;
 import com.minhavendas.vendas.repository.VendaRepository;
-import com.minhavendas.vendas.repository.VendedorRepository;
 
 import com.minhavendas.vendas.shared.VendaDTO;
 
@@ -26,10 +24,8 @@ public class VendaService {
     private ModelMapper mapper = new ModelMapper();
     @Autowired
     private ClienteRepository clienteRepository;
-    @Autowired
-    private VendedorRepository vendedorRepository;
 
-     public List<VendaDTO> obterTodos(){
+    public List<VendaDTO> obterTodos(){
         List<Venda> Vendas = vendaRepository.findAll();
         return Vendas.stream()
         .map(venda -> {
@@ -47,6 +43,12 @@ public class VendaService {
         }
         VendaDTO vendaDTO = mapper.map(Venda.get(), VendaDTO.class);
         return vendaDTO;
+    }
+
+    //obter o id do cliente relacionado a venda;
+    public Integer obterIdClienteVenda(Integer idvenda){
+       VendaDTO vendaDTO = obterVendaId(idvenda);
+       return vendaDTO.getCliente().getId();
     }
     
     public VendaDTO adicionar(VendaDTO vendaDto, Integer clienteId){
@@ -77,7 +79,7 @@ public class VendaService {
         vendaRepository.deleteById(id);
     }
 
-    public VendaDTO atualizar(VendaDTO vendaDto, Integer id, Integer clienteId, Integer vendedorId){
+    public VendaDTO atualizar(VendaDTO vendaDto, Integer id, Integer clienteId){
         Optional<Venda> venda = vendaRepository.findById(id);
         
         if(venda.isEmpty()){
@@ -92,20 +94,15 @@ public class VendaService {
             throw new IllegalArgumentException("O percentual de comissão deve estar entre 0% e 100%.");
         }
         Optional<Cliente> cliente = clienteRepository.findById(clienteId);
-        Optional<Vendedor> vendedor = vendedorRepository.findById(vendedorId);
 
         if(cliente.isEmpty()){
             throw new RuntimeException("Não existe um cliente com esse ID");
-        }
-        if(vendedor.isEmpty()){
-            throw new RuntimeException("Não existe um vendedor com esse ID");
         }
         
         vendaDto.setId(id);
         vendaDto.setDataVenda(venda.get().getDataVenda());
         vendaDto.setValorComissao(vendaDto.getValorTotal() * (vendaDto.getPercentualComissao()/100));
         vendaDto.setCliente(cliente.get());
-        vendaDto.setVendedor(vendedor.get());
 
         Venda VENDA = mapper.map(vendaDto, Venda.class);
         vendaRepository.save(VENDA);

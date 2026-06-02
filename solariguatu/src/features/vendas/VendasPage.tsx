@@ -260,7 +260,7 @@ export default function VendasPage() {
           <table className="w-full text-sm" style={{ fontFamily: 'var(--font-body)' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--color-border)', background: 'oklch(0.16 0.025 250 / 0.6)' }}>
-                {['Código', 'Cliente', 'Cidade', 'Vendedor', 'Produto', 'Valor', 'Comissão', 'Pagamento', 'Status', 'Data', 'Ações'].map((h) => (
+                {['Código', 'Cliente', 'Cidade', 'Produto', 'Valor', 'Comissão', 'Pagamento', 'Status', 'Data', 'Ações'].map((h) => (
                   <th key={h} className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider whitespace-nowrap" style={{ color: 'var(--color-muted)' }}>
                     {h}
                   </th>
@@ -295,7 +295,6 @@ export default function VendasPage() {
                       <p className="text-xs truncate" style={{ color: 'var(--color-muted)' }}>{c.cpfCnpj}</p>
                     </td>
                     <td className="px-4 py-3 text-xs whitespace-nowrap" style={{ color: 'var(--color-muted)' }}>{c.cidade}</td>
-                    <td className="px-4 py-3 text-xs whitespace-nowrap" style={{ color: 'var(--color-foreground)' }}>{c.vendedor}</td>
                     <td className="px-4 py-3 max-w-40">
                       <span className="text-xs" style={{ color: 'var(--color-foreground)' }}>{c.produto}</span>
                     </td>
