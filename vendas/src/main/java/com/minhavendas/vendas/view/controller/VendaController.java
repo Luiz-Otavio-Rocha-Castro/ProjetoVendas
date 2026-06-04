@@ -18,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.minhavendas.vendas.services.VendaService;
 import com.minhavendas.vendas.shared.VendaDTO;
 import com.minhavendas.vendas.view.model.CadastroCompleto;
-import com.minhavendas.vendas.view.model.Cliente.ClienteResponse;
+import com.minhavendas.vendas.view.model.Cliente.ClienteRequest;
+import com.minhavendas.vendas.view.model.Venda.VendaRequest;
 import com.minhavendas.vendas.view.model.Venda.VendaResponse;
 
 @RestController
@@ -58,10 +59,15 @@ public class VendaController {
 
     @PostMapping
     public ResponseEntity<VendaResponse> adicionar(@RequestBody CadastroCompleto requestCompleto) {
+
     ResponseEntity<Integer> clienteIdResponse = clienteController.adicionar(requestCompleto.getCliente());
     Integer idDoCliente = clienteIdResponse.getBody();
+
     VendaDTO vendaDTO = mapper.map(requestCompleto.getVenda(), VendaDTO.class);
+    
+    
     vendaDTO = vendaService.adicionar(vendaDTO, idDoCliente);
+    
     return new ResponseEntity<>(mapper.map(vendaDTO, VendaResponse.class), HttpStatus.CREATED);
 }
 
@@ -72,11 +78,11 @@ public class VendaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<VendaResponse> atualizar(@RequestBody CadastroCompleto requestCompleto, @PathVariable Integer id){
-        Integer idDoCliente = vendaService.obterIdClienteVenda(id);
-        ResponseEntity<ClienteResponse> retorno = clienteController.atualizar(idDoCliente, requestCompleto.getCliente());
-        VendaDTO vendaDTO = mapper.map(requestCompleto.getVenda(), VendaDTO.class);
-        vendaDTO = vendaService.atualizar(vendaDTO, id, idDoCliente);
-        return new ResponseEntity<>(mapper.map(vendaDTO, VendaResponse.class), HttpStatus.OK);
+    public ResponseEntity<VendaResponse> atualizar(@RequestBody ClienteRequest clienteRequest, @RequestBody VendaRequest vRequest, @PathVariable Integer id){
+        VendaDTO vendaDTO = mapper.map(vRequest, VendaDTO.class);
+        //vendaDTO = vendaService.atualizar(vendaDTO, id,vRequest.getClienteIdentificador(),vRequest.getVendedorIdentificador());
+        VendaResponse vendaResponse = mapper.map(vendaDTO, VendaResponse.class);
+        vendaResponse.setClienteNome(vendaDTO.getCliente().getNome());
+        return new ResponseEntity<>(vendaResponse, HttpStatus.OK);
     }
 }   
