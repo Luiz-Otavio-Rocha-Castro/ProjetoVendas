@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,12 +26,23 @@ public class VendedorController {
     private VendedorService VendedorService;
 
     private ModelMapper mapper = new ModelMapper();
- 
+
     @GetMapping("/{id}")
     public ResponseEntity<VendedorResponse> obterVendedorId(@PathVariable Integer id){
         VendedorDTO VendedorDto = VendedorService.obterVendedorId(id);
         VendedorResponse VendedorResponse = mapper.map(VendedorDto, VendedorResponse.class);
         return new ResponseEntity<>(VendedorResponse, HttpStatus.OK);
+    }
+
+
+    @PostMapping
+     public ResponseEntity<VendedorResponse> adicionar(@RequestBody VendedorRequest VendedorRequest){
+        VendedorDTO VendedorDTO = mapper.map(VendedorRequest, VendedorDTO.class);
+    
+        VendedorDTO = VendedorService.adcionar(VendedorDTO);
+
+        return new ResponseEntity<>(mapper.map(VendedorDTO, VendedorResponse.class), HttpStatus.CREATED);
+
     }
 
     @PutMapping("/{id}")

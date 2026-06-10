@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -17,6 +18,11 @@ import com.minhavendas.vendas.shared.VendedorDTO;
 public class VendedorService {
     @Autowired
     private VendedorRepository vendedorRepository;
+
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private ModelMapper mapper = new ModelMapper();
     
 
@@ -28,6 +34,25 @@ public class VendedorService {
         }
         return mapper.map(vendedor.get(), VendedorDTO.class);
     }
+
+
+    
+    public VendedorDTO adcionar(VendedorDTO vendedorDTO){
+        Vendedor vendedor = mapper.map(vendedorDTO, Vendedor.class);
+
+        String senhaLimpa = vendedor.getSenha();
+
+        String senhaCriptografada = passwordEncoder.encode(senhaLimpa);
+
+        vendedor.setSenha(senhaCriptografada);
+
+        vendedorRepository.save(vendedor);
+        
+        return mapper.map(vendedor, VendedorDTO.class);
+    }
+
+
+
 
     public VendedorDTO atualizar(VendedorDTO vendedorDTO, Integer id){
         VendedorDTO testeId = obterVendedorId(id);
