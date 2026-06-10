@@ -1,4 +1,4 @@
-package com.minhavendas.vendas.shared;
+package com.minhavendas.vendas.dto;
 
 public class VendedorDTO {
         //#region atributos
@@ -79,3 +79,4 @@ public class VendedorDTO {
     //#endregion
 
 }
+

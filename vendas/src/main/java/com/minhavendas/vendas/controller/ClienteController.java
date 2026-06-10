@@ -1,4 +1,4 @@
-package com.minhavendas.vendas.view.controller;
+package com.minhavendas.vendas.controller;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.minhavendas.vendas.services.ClienteService;
-import com.minhavendas.vendas.shared.ClienteDTO;
-import com.minhavendas.vendas.view.model.Cliente.ClienteRequest;
-import com.minhavendas.vendas.view.model.Cliente.ClienteResponse;
+import com.minhavendas.vendas.dto.ClienteDTO;
+import com.minhavendas.vendas.dto.request.ClienteRequest;
+import com.minhavendas.vendas.dto.response.ClienteResponse;
 
 @RestController
 @RequestMapping("api/vendas-cliente")
@@ -75,3 +75,5 @@ public class ClienteController {
     }
 
 }
+
+

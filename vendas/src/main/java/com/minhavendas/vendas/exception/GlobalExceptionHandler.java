@@ -1,11 +1,11 @@
-package com.minhavendas.vendas.view.handler;
+package com.minhavendas.vendas.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.minhavendas.vendas.model.error.ErrorMessage;
+import com.minhavendas.vendas.exception.ErrorMessage;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -45,3 +45,5 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(erro, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
+
+

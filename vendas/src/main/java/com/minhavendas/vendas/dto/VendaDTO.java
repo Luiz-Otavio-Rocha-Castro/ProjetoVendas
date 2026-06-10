@@ -1,8 +1,11 @@
-package com.minhavendas.vendas.view.model.Venda;
+package com.minhavendas.vendas.dto;
 
 import java.time.LocalDate;
 
-public class VendaResponse {
+import com.minhavendas.vendas.model.Cliente;
+import com.minhavendas.vendas.model.Vendedor;
+
+public class VendaDTO {
     //#region
     private Integer id;
 
@@ -13,7 +16,7 @@ public class VendaResponse {
     private String status;
     
     private Double saldoDevedor;
-
+    
     private LocalDate dataVenda;
     
     private Double valorTotal;
@@ -24,7 +27,9 @@ public class VendaResponse {
     
     private String formaPagamento;
     
-    private String clienteNome;
+    private Cliente cliente;
+
+    private Vendedor vendedor;
 
     //#endregion
 
@@ -44,7 +49,6 @@ public class VendaResponse {
     public void setProduto(String produto) {
         this.produto = produto;
     }
-
 
     public LocalDate getDataVenda() {
         return dataVenda;
@@ -85,12 +89,20 @@ public class VendaResponse {
     public void setFormaPagamento(String formaPagamento) {
         this.formaPagamento = formaPagamento;
     }
-       public String getClienteNome() {
-        return clienteNome;
+       public Cliente getCliente() {
+        return cliente;
     }
 
-    public void setClienteNome(String clienteNome) {
-        this.clienteNome = clienteNome;
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    public Vendedor getVendedor() {
+        return vendedor;
+    }
+
+    public void setVendedor(Vendedor vendedor) {
+        this.vendedor = vendedor;
     }
 
     public Integer getQuantidadePainel() {
@@ -119,3 +131,4 @@ public class VendaResponse {
 
     //#endregion
 }
+

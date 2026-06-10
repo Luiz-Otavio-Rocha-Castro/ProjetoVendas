@@ -1,5 +1,5 @@
 
-package com.minhavendas.vendas.services;
+package com.minhavendas.vendas.security;
 
 import java.util.ArrayList;
 import java.util.Collection;

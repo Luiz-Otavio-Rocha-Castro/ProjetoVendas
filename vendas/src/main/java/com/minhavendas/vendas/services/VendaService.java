@@ -14,7 +14,7 @@ import com.minhavendas.vendas.model.Venda;
 import com.minhavendas.vendas.repository.ClienteRepository;
 import com.minhavendas.vendas.repository.VendaRepository;
 
-import com.minhavendas.vendas.shared.VendaDTO;
+import com.minhavendas.vendas.dto.VendaDTO;
 
 
 @Service
@@ -112,3 +112,4 @@ public class VendaService {
 
 
 }
+

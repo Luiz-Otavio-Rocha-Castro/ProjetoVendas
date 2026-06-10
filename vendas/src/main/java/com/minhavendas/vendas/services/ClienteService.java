@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.minhavendas.vendas.model.Cliente;
 import com.minhavendas.vendas.repository.ClienteRepository;
-import com.minhavendas.vendas.shared.ClienteDTO;
+import com.minhavendas.vendas.dto.ClienteDTO;
 
 @Service
 public class ClienteService {

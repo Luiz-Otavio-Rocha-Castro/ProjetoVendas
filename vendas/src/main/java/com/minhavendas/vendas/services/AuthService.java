@@ -9,30 +9,33 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 import com.minhavendas.vendas.security.jwt.JwtUtils;
-import com.minhavendas.vendas.shared.AcessDTO;
-import com.minhavendas.vendas.shared.AuthenticationDTO;
+import com.minhavendas.vendas.dto.AcessDTO;
+import com.minhavendas.vendas.dto.AuthenticationDTO;
+import com.minhavendas.vendas.security.VendedorDetails;
 
-@Service
+@Service // Diz ao Spring: "Eu sou a classe que contém a lógica de negócio principal. Crie uma instância minha e injete onde precisarem de mim."
 public class AuthService {
 
-    @Autowired
+    @Autowired // Injeção de Dependência: O Spring automaticamente pega a classe JwtUtils (que tem @Component) e coloca aqui pra você usar.
     private JwtUtils jwtUtils;
 
-    @Autowired
+    @Autowired // Pega o Gerente de Autenticação configurado na sua classe WebSecurity.
     private AuthenticationManager authenticationManager;
     
     public AcessDTO login(AuthenticationDTO authDto){
         try{
-        //Cria uma intenção de login usando o e-mail e a senha que vieram do React
+        // 1. Cria o 'crachá temporário' (intenção de login) usando o e-mail e a senha que vieram do React
         UsernamePasswordAuthenticationToken userAuth = 
         new UsernamePasswordAuthenticationToken(authDto.getEmail(), authDto.getPassword());
 
-        //Prepara mecanismo para autenticacao
+        // 2. A MÁGICA ACONTECE AQUI: O authenticationManager pega o 'crachá temporário', vai até o banco de dados
+        // compara a senha criptografada do banco com a senha que o React enviou e vê se batem.
         Authentication authentication = authenticationManager.authenticate(userAuth);    
 
-        //busca o usuario logado
+        // 3. Se chegou nesta linha, a senha estava correta! Pegamos os detalhes do usuário logado.
         VendedorDetails userAuthenticate = (VendedorDetails)authentication.getPrincipal();
 
+        // 4. Manda o JwtUtils fabricar a string do Token JWT passando o usuário verificado.
         String token = jwtUtils.generateTokenFromVendedorDetails(userAuthenticate);
         
         AcessDTO acessDTO = new AcessDTO(token);
@@ -40,7 +43,8 @@ public class AuthService {
         return acessDTO;
 
         }catch(BadCredentialsException e){
-            
+            // Nota de Estudo: O bloco catch está vazio. Isso significa que ele 'engole' a exceção de erro de senha,
+            // e retorna o 200 OK abaixo com a string "Acesso Negado".
         }
         return new AcessDTO("Acesso Negado");
 

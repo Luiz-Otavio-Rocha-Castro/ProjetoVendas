@@ -1,7 +1,7 @@
-package com.minhavendas.vendas.view.model;
+package com.minhavendas.vendas.dto;
 
-import com.minhavendas.vendas.view.model.Cliente.ClienteRequest;
-import com.minhavendas.vendas.view.model.Venda.VendaRequest;
+import com.minhavendas.vendas.dto.request.ClienteRequest;
+import com.minhavendas.vendas.dto.request.VendaRequest;
 
 public class CadastroCompleto {
 
@@ -16,3 +16,4 @@ public class CadastroCompleto {
     public void setVenda(VendaRequest venda) { this.venda = venda; 
 }
 }
+

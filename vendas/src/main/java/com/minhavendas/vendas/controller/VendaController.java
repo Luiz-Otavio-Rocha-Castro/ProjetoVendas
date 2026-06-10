@@ -1,4 +1,4 @@
-package com.minhavendas.vendas.view.controller;
+package com.minhavendas.vendas.controller;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.minhavendas.vendas.services.VendaService;
-import com.minhavendas.vendas.shared.VendaDTO;
-import com.minhavendas.vendas.view.model.CadastroCompleto;
-import com.minhavendas.vendas.view.model.Cliente.ClienteRequest;
-import com.minhavendas.vendas.view.model.Venda.VendaRequest;
-import com.minhavendas.vendas.view.model.Venda.VendaResponse;
+import com.minhavendas.vendas.dto.VendaDTO;
+import com.minhavendas.vendas.dto.CadastroCompleto;
+import com.minhavendas.vendas.dto.request.ClienteRequest;
+import com.minhavendas.vendas.dto.request.VendaRequest;
+import com.minhavendas.vendas.dto.response.VendaResponse;
 
 @RestController
 @RequestMapping("api/venda")
@@ -86,3 +86,5 @@ public class VendaController {
         return new ResponseEntity<>(vendaResponse, HttpStatus.OK);
     }
 }   
+
+

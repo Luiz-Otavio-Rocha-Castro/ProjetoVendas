@@ -1,8 +1,11 @@
-package com.minhavendas.vendas.view.model.Venda;
+package com.minhavendas.vendas.dto.response;
 
+import java.time.LocalDate;
 
-public class VendaRequest {
+public class VendaResponse {
     //#region
+    private Integer id;
+
     private String produto;
 
     private Integer quantidadePainel;
@@ -11,21 +14,44 @@ public class VendaRequest {
     
     private Double saldoDevedor;
 
+    private LocalDate dataVenda;
+    
     private Double valorTotal;
     
     private Double percentualComissao;
     
+    private Double ValorComissao;
+    
     private String formaPagamento;
+    
+    private String clienteNome;
 
     //#endregion
 
     //#region gets e setts
-     public String getProduto() {
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getProduto() {
         return produto;
     }
 
     public void setProduto(String produto) {
         this.produto = produto;
+    }
+
+
+    public LocalDate getDataVenda() {
+        return dataVenda;
+    }
+
+    public void setDataVenda(LocalDate dataVenda) {
+        this.dataVenda = dataVenda;
     }
 
     public Double getValorTotal() {
@@ -44,12 +70,27 @@ public class VendaRequest {
         this.percentualComissao = percentualComissao;
     }
 
+    public Double getValorComissao() {
+        return ValorComissao;
+    }
+
+    public void setValorComissao(Double valorComissao) {
+        ValorComissao = valorComissao;
+    }
+
     public String getFormaPagamento() {
         return formaPagamento;
     }
 
     public void setFormaPagamento(String formaPagamento) {
         this.formaPagamento = formaPagamento;
+    }
+       public String getClienteNome() {
+        return clienteNome;
+    }
+
+    public void setClienteNome(String clienteNome) {
+        this.clienteNome = clienteNome;
     }
 
     public Integer getQuantidadePainel() {
@@ -78,3 +119,4 @@ public class VendaRequest {
 
     //#endregion
 }
+

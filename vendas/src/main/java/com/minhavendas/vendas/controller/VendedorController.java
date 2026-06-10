@@ -1,4 +1,4 @@
-package com.minhavendas.vendas.view.controller;
+package com.minhavendas.vendas.controller;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.minhavendas.vendas.services.VendedorService;
-import com.minhavendas.vendas.shared.VendedorDTO;
-import com.minhavendas.vendas.view.model.Vendedor.VendedorRequest;
-import com.minhavendas.vendas.view.model.Vendedor.VendedorResponse;
+import com.minhavendas.vendas.dto.VendedorDTO;
+import com.minhavendas.vendas.dto.request.VendedorRequest;
+import com.minhavendas.vendas.dto.response.VendedorResponse;
 
 
 @RestController
@@ -56,3 +56,5 @@ public class VendedorController {
     }
 
 }
+
+

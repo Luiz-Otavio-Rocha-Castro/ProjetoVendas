@@ -1,12 +1,12 @@
-package com.minhavendas.vendas.shared;
-public class ClienteDTO {
-     //#region atributos cliente
+package com.minhavendas.vendas.dto.response;
+
+public class ClienteResponse {
     private Integer id;
     
     private String nome;
-
-    private String cpf;
     
+    private String cpf; 
+
     private String telefone;
     
     private String endereco;
@@ -53,3 +53,4 @@ public class ClienteDTO {
         this.cpf = cpf;
     }
 }
+

@@ -1,4 +1,4 @@
-package com.minhavendas.vendas.shared;
+package com.minhavendas.vendas.dto;
 
 public class AcessDTO {
     private String token;
@@ -17,3 +17,4 @@ public class AcessDTO {
 
     
 }
+

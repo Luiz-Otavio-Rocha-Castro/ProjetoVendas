@@ -1,25 +1,18 @@
-package com.minhavendas.vendas.view.model.Cliente;
+package com.minhavendas.vendas.dto.request;
 
-public class ClienteResponse {
-    private Integer id;
-    
+public class ClienteRequest {    
     private String nome;
     
-    private String cpf; 
+    private String cpf;
 
     private String telefone;
     
     private String endereco;
+
+
     //#endregion
 
     //#region gets e setters
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getNome() {
         return nome;
@@ -44,7 +37,6 @@ public class ClienteResponse {
     public void setEndereco(String endereco) {
         this.endereco = endereco;
     }
-
     public String getCpf() {
         return cpf;
     }
@@ -53,3 +45,4 @@ public class ClienteResponse {
         this.cpf = cpf;
     }
 }
+

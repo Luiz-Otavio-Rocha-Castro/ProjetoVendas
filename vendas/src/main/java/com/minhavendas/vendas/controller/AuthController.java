@@ -1,4 +1,4 @@
-package com.minhavendas.vendas.view.controller;
+package com.minhavendas.vendas.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.minhavendas.vendas.services.AuthService;
-import com.minhavendas.vendas.shared.AuthenticationDTO;
+import com.minhavendas.vendas.dto.AuthenticationDTO;
 
 @RestController
 @RequestMapping("/auth")
@@ -25,3 +25,5 @@ public class AuthController {
     }
 
 }
+
+

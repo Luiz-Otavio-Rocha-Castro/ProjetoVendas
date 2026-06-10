@@ -1,4 +1,4 @@
-package com.minhavendas.vendas.shared;
+package com.minhavendas.vendas.dto;
 
 public class AuthenticationDTO {
     
@@ -21,3 +21,4 @@ public class AuthenticationDTO {
 
     
 }
+

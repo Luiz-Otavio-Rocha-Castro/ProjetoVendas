@@ -1,29 +1,24 @@
-package com.minhavendas.vendas.view.model.Vendedor;
+package com.minhavendas.vendas.dto.request;
 
-public class VendedorResponse {
+public class VendedorRequest {
     //#region atributos
-    private Integer id;
 
     private String nome;
 
     private String email;
+
+    private String senha;
 
     private String regiaoAtuacao;
 
     private Double metaMensal;
 
     private Double metaKwp;
+
     //#endregion
 
     //#region GEts e setters
-     public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
+    
     public String getNome() {
         return nome;
     }
@@ -39,6 +34,15 @@ public class VendedorResponse {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
+
 
     public String getRegiaoAtuacao() {
         return regiaoAtuacao;
@@ -64,6 +68,6 @@ public class VendedorResponse {
         this.metaKwp = metaKwp;
     }
 
-    
     //#endregion
 }
+

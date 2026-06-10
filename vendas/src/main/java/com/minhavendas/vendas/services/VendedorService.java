@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.minhavendas.vendas.model.Vendedor;
 import com.minhavendas.vendas.repository.VendedorRepository;
-import com.minhavendas.vendas.shared.VendedorDTO;
+import com.minhavendas.vendas.dto.VendedorDTO;
 
 @Service
 public class VendedorService {
@@ -64,3 +64,4 @@ public class VendedorService {
     }
     
 }
+

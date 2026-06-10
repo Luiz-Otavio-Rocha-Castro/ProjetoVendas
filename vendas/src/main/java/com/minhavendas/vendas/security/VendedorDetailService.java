@@ -1,4 +1,4 @@
-package com.minhavendas.vendas.services;
+package com.minhavendas.vendas.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,3 +22,4 @@ public class VendedorDetailService implements UserDetailsService {
     }
     
 }
+

@@ -1,4 +1,4 @@
-package com.minhavendas.vendas.model.error;
+package com.minhavendas.vendas.exception;
 
 import java.time.LocalDateTime;
 
@@ -39,3 +39,4 @@ public class ErrorMessage {
     }
     
 }
+

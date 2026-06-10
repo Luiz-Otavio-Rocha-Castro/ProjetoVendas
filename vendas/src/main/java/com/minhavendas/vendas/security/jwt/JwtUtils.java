@@ -15,7 +15,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.io.Decoders;
 
-import com.minhavendas.vendas.services.VendedorDetails;
+import com.minhavendas.vendas.security.VendedorDetails;
 
 
 /**
@@ -92,3 +92,4 @@ public class JwtUtils {
     }
 
 }
+
