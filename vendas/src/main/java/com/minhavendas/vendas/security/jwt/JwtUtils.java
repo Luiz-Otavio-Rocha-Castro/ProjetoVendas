@@ -70,6 +70,12 @@ public class JwtUtils {
         return key;
     }
 
+
+    public String getEmailToken(String token){
+        return Jwts.parserBuilder().setSigningKey(getSigninKey()).build().parseClaimsJws(token).getBody().getSubject();
+    }
+
+
     public boolean validateJwtToken(String authtoken){
         try {
             Jwts.parserBuilder().setSigningKey(getSigninKey()).build().parseClaimsJws(authtoken);

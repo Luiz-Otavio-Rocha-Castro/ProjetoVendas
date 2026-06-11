@@ -12,8 +12,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.minhavendas.vendas.security.jwt.AuthEntryPointJwt;
+import com.minhavendas.vendas.security.jwt.AuthFilterToken;
 
 @Configuration
 @EnableMethodSecurity
@@ -46,6 +48,12 @@ public class WebSecurity {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+
+    @Bean
+    public AuthFilterToken authFilterToken(){
+        return new AuthFilterToken();
+    }
+
     // FERRAMENTA 3: A ESTEIRA DE SEGURANÇA (SecurityFilterChain)
     // Esse método é o mais importante de todos. Ele funciona como uma "esteira de aeroporto" (filtro).
     // Cada requisição que vem do React entra nessa esteira e passa por todas as checagens abaixo:
@@ -70,9 +78,10 @@ public class WebSecurity {
             // .requestMatchers("/auth/**").permitAll(): Abre uma EXCEÇÃO. Qualquer rota que comece com "/auth/"
             // (como /auth/login ou /auth/cadastro) está TOTALMENTE LIBERADA para qualquer um acessar sem token.
             .authorizeHttpRequests(auth ->  auth.requestMatchers("/auth/**").permitAll()
-                                   .requestMatchers("/api/vendas-vendedor/**").permitAll());
+                                   .requestMatchers("/api/vendas-vendedor/**").permitAll()
+                                .anyRequest().authenticated());
             
-        
+        http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class);
 
         // Finaliza a montagem da esteira e devolve ela pronta para o Spring Boot monitorar o sistema.
         return http.build();
