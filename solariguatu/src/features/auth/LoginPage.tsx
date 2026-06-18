@@ -27,7 +27,7 @@ export default function LoginPage() {
     if (ok) {
       navigate('/dashboard')
     } else {
-      setError('E-mail inválido. Use um formato válido (ex: usuario@email.com).')
+      setError('E-mail ou senha incorretos.')
     }
   }
 
@@ -155,16 +155,6 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          {/* Hint */}
-          <div
-            className="mt-6 rounded-xl px-4 py-3 flex items-start gap-2"
-            style={{ background: 'var(--color-primary-subtle)', border: '1px solid var(--color-primary-glow)' }}
-          >
-            <Zap size={13} className="mt-0.5 shrink-0" style={{ color: 'var(--color-primary)' }} />
-            <p className="text-xs leading-relaxed" style={{ color: 'var(--color-primary)' }}>
-              <strong>Demo:</strong> Qualquer e-mail válido e qualquer senha funcionam para entrar.
-            </p>
-          </div>
         </div>
 
         <p className="text-center text-xs mt-4" style={{ color: 'var(--color-muted)' }}>

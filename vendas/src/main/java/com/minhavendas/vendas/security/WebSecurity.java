@@ -13,6 +13,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import java.util.Arrays;
 
 import com.minhavendas.vendas.security.jwt.AuthEntryPointJwt;
 import com.minhavendas.vendas.security.jwt.AuthFilterToken;
@@ -86,6 +90,21 @@ public class WebSecurity {
         // Finaliza a montagem da esteira e devolve ela pronta para o Spring Boot monitorar o sistema.
         return http.build();
 
+    }
+
+    // Configuração Global de CORS para permitir requisições do frontend com o Token
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // Coloque aqui a porta onde o seu frontend está rodando
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5174", "http://localhost:5173")); 
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
+        configuration.setAllowCredentials(true);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
 }

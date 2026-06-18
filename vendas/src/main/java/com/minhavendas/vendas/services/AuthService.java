@@ -23,7 +23,6 @@ public class AuthService {
     private AuthenticationManager authenticationManager;
     
     public AcessDTO login(AuthenticationDTO authDto){
-        try{
         // 1. Cria o 'crachá temporário' (intenção de login) usando o e-mail e a senha que vieram do React
         UsernamePasswordAuthenticationToken userAuth = 
         new UsernamePasswordAuthenticationToken(authDto.getEmail(), authDto.getPassword());
@@ -38,15 +37,6 @@ public class AuthService {
         // 4. Manda o JwtUtils fabricar a string do Token JWT passando o usuário verificado.
         String token = jwtUtils.generateTokenFromVendedorDetails(userAuthenticate);
         
-        AcessDTO acessDTO = new AcessDTO(token);
-
-        return acessDTO;
-
-        }catch(BadCredentialsException e){
-            // Nota de Estudo: O bloco catch está vazio. Isso significa que ele 'engole' a exceção de erro de senha,
-            // e retorna o 200 OK abaixo com a string "Acesso Negado".
-        }
-        return new AcessDTO("Acesso Negado");
-
+        return new AcessDTO(token);
     }
 }

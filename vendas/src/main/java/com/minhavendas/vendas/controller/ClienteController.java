@@ -24,57 +24,54 @@ import com.minhavendas.vendas.dto.response.ClienteResponse;
 
 @RestController
 @RequestMapping("api/vendas-cliente")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5174")
 public class ClienteController {
-    
+
     @Autowired
     private ClienteService clienteService;
-
 
     private ModelMapper mapper = new ModelMapper();
 
     @GetMapping
-    public ResponseEntity<List<ClienteResponse>> obterTodos(){
+    public ResponseEntity<List<ClienteResponse>> obterTodos() {
         List<ClienteDTO> clientes = clienteService.obterTodos();
 
         List<ClienteResponse> resposta = clientes.stream()
-        .map(clienteDto -> mapper.map(clienteDto, ClienteResponse.class))
-        .collect(Collectors.toList());
+                .map(clienteDto -> mapper.map(clienteDto, ClienteResponse.class))
+                .collect(Collectors.toList());
 
-        return new ResponseEntity<>(resposta,HttpStatus.OK);
+        return new ResponseEntity<>(resposta, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ClienteResponse> obterClienteId(@PathVariable Integer id){
+    public ResponseEntity<ClienteResponse> obterClienteId(@PathVariable Integer id) {
         ClienteDTO clienteDto = clienteService.obterClienteId(id);
         ClienteResponse clienteResponse = mapper.map(clienteDto, ClienteResponse.class);
         return new ResponseEntity<>(clienteResponse, HttpStatus.OK);
     }
 
-    
-
-
     @PostMapping
-    public ResponseEntity<Integer> adicionar(@RequestBody ClienteRequest clienteRequest){
+    public ResponseEntity<Integer> adicionar(@RequestBody ClienteRequest clienteRequest) {
         ClienteDTO clienteDTO = mapper.map(clienteRequest, ClienteDTO.class);
         clienteDTO = clienteService.adicionar(clienteDTO);
         return new ResponseEntity<>(mapper.map(clienteDTO, ClienteResponse.class).getId(), HttpStatus.CREATED);
     }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletar(@PathVariable Integer id){
+    public ResponseEntity<String> deletar(@PathVariable Integer id) {
         clienteService.deletar(id);
         return new ResponseEntity<>("Cliente do id: " + id + " removido com sucesso", HttpStatus.NO_CONTENT);
     }
+
     @PutMapping("/{id}")
-    public ResponseEntity<ClienteResponse> atualizar(@PathVariable Integer id, @RequestBody ClienteRequest clienteRequest){
+    public ResponseEntity<ClienteResponse> atualizar(@PathVariable Integer id,
+            @RequestBody ClienteRequest clienteRequest) {
         ClienteDTO clienteDTO = mapper.map(clienteRequest, ClienteDTO.class);
-    
+
         clienteDTO = clienteService.atualizar(clienteDTO, id);
 
-         return new ResponseEntity<>(mapper.map(clienteDTO, ClienteResponse.class), HttpStatus.OK);
+        return new ResponseEntity<>(mapper.map(clienteDTO, ClienteResponse.class), HttpStatus.OK);
 
     }
 
 }
-
-

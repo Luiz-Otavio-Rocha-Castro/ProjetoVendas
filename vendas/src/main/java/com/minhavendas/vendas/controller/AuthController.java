@@ -13,17 +13,15 @@ import com.minhavendas.vendas.dto.AuthenticationDTO;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:5174")
 public class AuthController {
 
     @Autowired
     private AuthService authService;
-    
+
     @PostMapping(value = "/login")
-    public ResponseEntity<?> login(@RequestBody AuthenticationDTO authDto){
+    public ResponseEntity<?> login(@RequestBody AuthenticationDTO authDto) {
         return ResponseEntity.ok(authService.login(authDto));
     }
 
 }
-
-
