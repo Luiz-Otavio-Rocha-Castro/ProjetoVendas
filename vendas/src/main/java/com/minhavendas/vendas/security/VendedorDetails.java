@@ -1,4 +1,3 @@
-
 package com.minhavendas.vendas.security;
 
 import java.util.ArrayList;
@@ -19,6 +18,8 @@ public class VendedorDetails implements UserDetails{
 
 
     private Integer id;
+    
+    private String nome;
 
     private String email;
 
@@ -27,17 +28,25 @@ public class VendedorDetails implements UserDetails{
     private Collection <? extends GrantedAuthority> authorities;
 
 
-    public VendedorDetails(Integer id, String email, String senha, Collection<? extends GrantedAuthority> authorities) {
+    public VendedorDetails(Integer id, String nome, String email, String senha, Collection<? extends GrantedAuthority> authorities) {
             this.id = id;
+            this.nome = nome;
             this.email = email;
             this.senha = senha;
             this.authorities = authorities;
         }
 
     public static VendedorDetails build(Vendedor vendedor){
-        return new VendedorDetails(vendedor.getId(), vendedor.getEmail(), vendedor.getSenha(), new ArrayList<>());
+        return new VendedorDetails(vendedor.getId(), vendedor.getNome(), vendedor.getEmail(), vendedor.getSenha(), new ArrayList<>());
     }
     
+    public String getNome() {
+        return nome;
+    }
+    
+    public Integer getId() {
+        return id;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

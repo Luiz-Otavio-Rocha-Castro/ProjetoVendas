@@ -43,13 +43,15 @@ function ToastCard({ t }: { t: ToastItem }) {
       </div>
 
       {/* Close */}
-      <button
-        onClick={() => dismiss(t.id)}
-        className="shrink-0 p-1 rounded-lg transition-colors hover:bg-white/10"
-        style={{ color: 'var(--color-muted)' }}
-      >
-        <X size={13} />
-      </button>
+        <button
+          onClick={() => dismiss(t.id)}
+          className="shrink-0 p-1 rounded-lg transition-colors"
+          style={{ color: 'var(--color-muted)' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--color-surface-2)' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}
+        >
+          <X size={13} />
+        </button>
 
       {/* Progress bar */}
       <div

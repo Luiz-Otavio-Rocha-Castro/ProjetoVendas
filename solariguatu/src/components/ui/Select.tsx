@@ -9,30 +9,41 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 
 export default function Select({ label, options, error, className = '', ...props }: SelectProps) {
   return (
-    <div className="flex flex-col gap-1.5">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       {label && (
-        <label className="text-xs font-medium" style={{ color: 'var(--color-muted)', fontFamily: 'var(--font-body)' }}>
+        <label style={{
+          fontSize: '0.8rem', fontWeight: 600,
+          color: 'var(--color-foreground-2)',
+          fontFamily: 'var(--font-body)',
+        }}>
           {label}
         </label>
       )}
-      <div className="relative">
+      <div style={{ position: 'relative' }}>
         <select
           {...props}
-          className={`input-base appearance-none pr-8 ${error ? 'border-[var(--color-danger)]' : ''} ${className}`}
+          className={`input-base ${error ? 'border-[var(--color-danger)]' : ''} ${className}`}
+          style={{
+            appearance: 'none', paddingRight: '32px', cursor: 'pointer',
+            ...(props.style || {}),
+          }}
         >
           {options.map((o) => (
-            <option key={o.value} value={o.value} style={{ background: '#1a1f2e', color: '#f0f0f5' }}>
+            <option key={o.value} value={o.value} style={{ background: '#FFFFFF', color: '#0F1929' }}>
               {o.label}
             </option>
           ))}
         </select>
         <ChevronDown
           size={14}
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
-          style={{ color: 'var(--color-muted)' }}
+          style={{
+            position: 'absolute', right: '10px', top: '50%',
+            transform: 'translateY(-50%)',
+            pointerEvents: 'none', color: 'var(--color-muted)',
+          }}
         />
       </div>
-      {error && <span className="text-xs" style={{ color: 'var(--color-danger)' }}>{error}</span>}
+      {error && <span style={{ fontSize: '0.75rem', color: 'var(--color-danger)' }}>{error}</span>}
     </div>
   )
 }

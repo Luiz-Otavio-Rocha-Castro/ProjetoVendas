@@ -42,7 +42,7 @@ function Section({ title, icon, children }: { title: string; icon: React.ReactNo
 }
 
 export default function PerfilPage() {
-  const { perfil, saving, updatePerfil } = usePerfil()
+  const { perfil, saving, loading, updatePerfil } = usePerfil()
   const { toast } = useToast()
 
   // Form state
@@ -72,25 +72,41 @@ export default function PerfilPage() {
     if (isNaN(metaR) || metaR <= 0) { toast('error', 'Meta inválida', 'Informe um valor de meta em R$ válido.'); return }
     if (isNaN(metaK) || metaK <= 0) { toast('error', 'Meta inválida', 'Informe uma meta de kWp válida.'); return }
 
-    await updatePerfil({ nome: nome.trim(), regiao: regiao.trim(), metaReais: metaR, metaKwp: metaK })
-    toast('success', 'Perfil atualizado!', 'Suas informações foram salvas com sucesso.')
+    try {
+      await updatePerfil({ nome: nome.trim(), regiao: regiao.trim(), metaReais: metaR, metaKwp: metaK })
+      toast('success', 'Perfil atualizado!', 'Suas informações foram salvas com sucesso.')
+    } catch {
+      toast('error', 'Erro ao salvar', 'Não foi possível atualizar o perfil.')
+    }
   }
 
   const handleSaveSenha = async (e: FormEvent) => {
     e.preventDefault()
     if (!senhaAtual || !novaSenha) { toast('error', 'Campos obrigatórios', 'Preencha a senha atual e a nova senha.'); return }
     if (novaSenha.length < 6) { toast('error', 'Senha fraca', 'A nova senha deve ter pelo menos 6 caracteres.'); return }
-    // Simulate password update
-    await new Promise((r) => setTimeout(r, 700))
-    setSenhaAtual('')
-    setNovaSenha('')
-    toast('success', 'Senha alterada!', 'Sua senha foi atualizada com sucesso.')
+    
+    try {
+      await updatePerfil({ senha: novaSenha })
+      setSenhaAtual('')
+      setNovaSenha('')
+      toast('success', 'Senha alterada!', 'Sua senha foi atualizada com sucesso.')
+    } catch {
+      toast('error', 'Erro ao atualizar', 'Não foi possível alterar a senha.')
+    }
   }
 
-  const pctReais = Math.min(100, Math.round((perfil.faturamentoAtual / perfil.metaReais) * 100))
-  const pctKwp   = Math.min(100, Math.round((perfil.kwpAtual / perfil.metaKwp) * 100))
+  const pctReais = Math.min(100, Math.round((perfil.faturamentoAtual / (perfil.metaReais || 1)) * 100))
+  const pctKwp   = Math.min(100, Math.round((perfil.kwpAtual / (perfil.metaKwp || 1)) * 100))
 
-  const initials = perfil.nome.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
+  const initials = perfil.avatar || 'V'
+
+  if (loading) {
+    return (
+      <div className="flex h-full w-full items-center justify-center p-8">
+        <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>Carregando perfil...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-6 animate-fadeIn">

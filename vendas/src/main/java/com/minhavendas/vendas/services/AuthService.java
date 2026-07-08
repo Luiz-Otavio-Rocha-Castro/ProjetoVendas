@@ -37,6 +37,11 @@ public class AuthService {
         // 4. Manda o JwtUtils fabricar a string do Token JWT passando o usuário verificado.
         String token = jwtUtils.generateTokenFromVendedorDetails(userAuthenticate);
         
-        return new AcessDTO(token);
+        com.minhavendas.vendas.dto.VendedorDTO vendedorDTO = new com.minhavendas.vendas.dto.VendedorDTO();
+        vendedorDTO.setId(userAuthenticate.getId());
+        vendedorDTO.setNome(userAuthenticate.getNome());
+        vendedorDTO.setEmail(userAuthenticate.getUsername());
+        
+        return new AcessDTO(token, vendedorDTO);
     }
 }

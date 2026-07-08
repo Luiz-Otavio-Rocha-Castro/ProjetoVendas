@@ -24,7 +24,7 @@ import com.minhavendas.vendas.dto.response.ClienteResponse;
 
 @RestController
 @RequestMapping("api/vendas-cliente")
-@CrossOrigin(origins = "http://localhost:5174")
+
 public class ClienteController {
 
     @Autowired

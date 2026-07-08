@@ -55,9 +55,16 @@ public class VendedorService {
 
 
     public VendedorDTO atualizar(VendedorDTO vendedorDTO, Integer id){
-        VendedorDTO testeId = obterVendedorId(id);
+        VendedorDTO vendedorAntigo = obterVendedorId(id);
 
         vendedorDTO.setId(id);
+        
+        if (vendedorDTO.getSenha() == null || vendedorDTO.getSenha().trim().isEmpty()) {
+            vendedorDTO.setSenha(vendedorAntigo.getSenha());
+        } else {
+            vendedorDTO.setSenha(passwordEncoder.encode(vendedorDTO.getSenha()));
+        }
+        
         Vendedor vendedor = mapper.map(vendedorDTO, Vendedor.class);
         vendedorRepository.save(vendedor);
         return vendedorDTO;

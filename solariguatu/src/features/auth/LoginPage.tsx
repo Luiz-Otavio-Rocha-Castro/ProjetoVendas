@@ -1,6 +1,6 @@
 import { useState, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Sun, Mail, Lock, ArrowRight, Zap } from 'lucide-react'
+import { Mail, Lock, ArrowRight, Zap, Sun } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
@@ -32,135 +32,310 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ background: 'var(--color-background)' }}>
-      {/* ── Background abstract shapes ── */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Orb grande âmbar */}
-        <div
-          className="absolute rounded-full blur-3xl opacity-20"
-          style={{
-            width: '600px', height: '600px',
-            top: '-200px', left: '-150px',
-            background: 'radial-gradient(circle, oklch(0.78 0.18 65), transparent 70%)',
-          }}
-        />
-        {/* Orb azul */}
-        <div
-          className="absolute rounded-full blur-3xl opacity-10"
-          style={{
-            width: '500px', height: '500px',
-            bottom: '-150px', right: '-100px',
-            background: 'radial-gradient(circle, oklch(0.55 0.18 220), transparent 70%)',
-          }}
-        />
-        {/* Grid lines */}
-        <div
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: `
-              linear-gradient(oklch(0.78 0.18 65 / 0.5) 1px, transparent 1px),
-              linear-gradient(90deg, oklch(0.78 0.18 65 / 0.5) 1px, transparent 1px)
-            `,
-            backgroundSize: '60px 60px',
-          }}
-        />
-        {/* Floating solar panels */}
-        {[
-          { top: '15%', left: '8%',  size: 48, delay: '0s',    opacity: 0.07 },
-          { top: '70%', left: '5%',  size: 36, delay: '1.2s',  opacity: 0.05 },
-          { top: '20%', right: '6%', size: 56, delay: '0.6s',  opacity: 0.07 },
-          { top: '75%', right: '8%', size: 40, delay: '1.8s',  opacity: 0.05 },
-        ].map((s, i) => (
-          <div
-            key={i}
-            className="absolute animate-spin-slow"
-            style={{ top: s.top, left: (s as any).left, right: (s as any).right, opacity: s.opacity, animationDuration: `${14 + i * 4}s`, animationDelay: s.delay }}
-          >
-            <Sun size={s.size} style={{ color: 'var(--color-primary)' }} strokeWidth={0.8} />
-          </div>
-        ))}
-      </div>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#F4F6FA' }}>
 
-      {/* ── Card ── */}
-      <div className="relative z-10 w-full max-w-sm mx-4 animate-scaleIn">
-        <div className="glass-strong rounded-3xl p-8 glow-amber">
-          {/* Top glow line */}
-          <div
-            className="absolute top-0 inset-x-8 h-px rounded-full"
-            style={{ background: 'linear-gradient(90deg, transparent, var(--color-primary), transparent)' }}
+      {/* ── Lado Esquerdo: Brand Panel ── */}
+      <div
+        style={{
+          flex: '0 0 48%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '48px',
+          position: 'relative',
+          overflow: 'hidden',
+          background: 'linear-gradient(145deg, #1E2D4E 0%, #253760 50%, #1a2844 100%)',
+        }}
+        className="login-panel-left"
+      >
+        {/* Decorative rings */}
+        <div style={{
+          position: 'absolute', top: '-80px', right: '-80px',
+          width: '360px', height: '360px', borderRadius: '50%',
+          border: '1px solid rgba(232,144,26,0.12)',
+          pointerEvents: 'none',
+        }} />
+        <div style={{
+          position: 'absolute', top: '-40px', right: '-40px',
+          width: '260px', height: '260px', borderRadius: '50%',
+          border: '1px solid rgba(232,144,26,0.18)',
+          pointerEvents: 'none',
+        }} />
+        <div style={{
+          position: 'absolute', bottom: '-60px', left: '-60px',
+          width: '300px', height: '300px', borderRadius: '50%',
+          border: '1px solid rgba(255,255,255,0.05)',
+          pointerEvents: 'none',
+        }} />
+
+        {/* Ambient glow */}
+        <div style={{
+          position: 'absolute', top: '30%', left: '50%', transform: 'translate(-50%,-50%)',
+          width: '420px', height: '420px', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(232,144,26,0.12) 0%, transparent 65%)',
+          pointerEvents: 'none',
+        }} />
+
+        {/* Content */}
+        <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', maxWidth: '380px' }} className="animate-sunRise">
+          {/* Logo image real */}
+          <img
+            src="/logo.jpg"
+            alt="SolarIguatu"
+            style={{
+              height: '90px',
+              objectFit: 'contain',
+              margin: '0 auto 24px',
+              display: 'block',
+              filter: 'drop-shadow(0 8px 24px rgba(232,144,26,0.35))',
+            }}
           />
 
-          {/* Brand */}
-          <div className="flex flex-col items-center gap-3 mb-8">
-            <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center animate-pulse-glow"
-              style={{ background: 'var(--color-primary)', color: '#0a0a0a' }}
-            >
-              <Sun size={26} strokeWidth={2} />
-            </div>
-            <div className="text-center">
-              <h1
-                className="text-xl font-extrabold tracking-tight text-glow-amber"
-                style={{ fontFamily: 'var(--font-display)', color: 'var(--color-primary)' }}
-              >
-                SolarIguatu
-              </h1>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--color-muted)' }}>
-                Sistema de Gestão Comercial
-              </p>
-            </div>
-          </div>
+          <h1 style={{
+            fontSize: '2rem', fontWeight: 800, lineHeight: 1.15,
+            color: '#FFFFFF', margin: '0 0 8px',
+            fontFamily: 'var(--font-display)',
+            letterSpacing: '-0.03em',
+          }}>
+            Solar<span style={{ color: '#E8901A' }}>Iguatu</span>
+          </h1>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <Input
-              label="E-mail"
-              type="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              leftIcon={<Mail size={15} />}
-              autoComplete="email"
-              autoFocus
-            />
-            <Input
-              label="Senha"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              leftIcon={<Lock size={15} />}
-              autoComplete="current-password"
-            />
+          <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.55)', margin: '0 0 48px', lineHeight: 1.6 }}>
+            Eficiência e Sustentabilidade
+          </p>
 
-            {error && (
+          {/* Feature pills */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {[
+              { icon: <Zap size={14} />, text: 'Gerencie contratos em tempo real' },
+              { icon: <Sun size={14} />, text: 'Acompanhe metas de kWp e faturamento' },
+              { icon: <ArrowRight size={14} />, text: 'Pipeline de vendas visual e intuitivo' },
+            ].map((item, i) => (
               <div
-                className="rounded-xl px-4 py-3 text-xs animate-slideDown"
-                style={{ background: 'oklch(0.65 0.22 25 / 0.12)', color: 'var(--color-danger)', border: '1px solid oklch(0.65 0.22 25 / 0.25)' }}
+                key={i}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '10px',
+                  padding: '10px 16px', borderRadius: '10px',
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  animationDelay: `${(i + 1) * 100}ms`,
+                  color: 'rgba(255,255,255,0.75)',
+                  fontSize: '0.82rem',
+                  textAlign: 'left',
+                }}
+                className="animate-slideUp"
               >
-                {error}
+                <span style={{ color: '#E8901A', flexShrink: 0 }}>{item.icon}</span>
+                {item.text}
               </div>
-            )}
-
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              loading={loading}
-              className="w-full mt-2"
-              style={{ boxShadow: '0 4px 24px var(--color-primary-glow)', borderRadius: '14px' }}
-            >
-              {!loading && <ArrowRight size={16} />}
-              {loading ? 'Autenticando...' : 'Entrar'}
-            </Button>
-          </form>
-
+            ))}
+          </div>
         </div>
 
-        <p className="text-center text-xs mt-4" style={{ color: 'var(--color-muted)' }}>
+        {/* Bottom copyright */}
+        <p style={{
+          position: 'absolute', bottom: '24px',
+          fontSize: '0.72rem', color: 'rgba(255,255,255,0.28)',
+          fontFamily: 'var(--font-body)',
+        }}>
           © 2025 SolarIguatu · Todos os direitos reservados
         </p>
       </div>
+
+      {/* ── Lado Direito: Formulário ── */}
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '48px 40px',
+        background: '#FFFFFF',
+      }}>
+        <div style={{ width: '100%', maxWidth: '380px' }} className="animate-scaleIn">
+
+          {/* Header do formulário */}
+          <div style={{ marginBottom: '32px' }}>
+            <h2 style={{
+              fontSize: '1.6rem', fontWeight: 800,
+              color: 'var(--color-foreground)',
+              margin: '0 0 6px',
+              fontFamily: 'var(--font-display)',
+              letterSpacing: '-0.025em',
+            }}>
+              Bem-vindo de volta
+            </h2>
+            <p style={{ fontSize: '0.875rem', color: 'var(--color-muted)', margin: 0 }}>
+              Entre com suas credenciais para continuar
+            </p>
+          </div>
+
+          {/* Formulário */}
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{
+                fontSize: '0.8rem', fontWeight: 600,
+                color: 'var(--color-foreground-2)',
+                fontFamily: 'var(--font-body)',
+              }}>
+                E-mail
+              </label>
+              <div style={{ position: 'relative' }}>
+                <span style={{
+                  position: 'absolute', left: '12px', top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--color-muted-light)',
+                  pointerEvents: 'none', zIndex: 1,
+                  display: 'flex', alignItems: 'center',
+                }}>
+                  <Mail size={15} />
+                </span>
+                <input
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  autoFocus
+                  id="login-email"
+                  className="input-base"
+                  style={{ paddingLeft: '38px' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{
+                fontSize: '0.8rem', fontWeight: 600,
+                color: 'var(--color-foreground-2)',
+                fontFamily: 'var(--font-body)',
+              }}>
+                Senha
+              </label>
+              <div style={{ position: 'relative' }}>
+                <span style={{
+                  position: 'absolute', left: '12px', top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--color-muted-light)',
+                  pointerEvents: 'none', zIndex: 1,
+                  display: 'flex', alignItems: 'center',
+                }}>
+                  <Lock size={15} />
+                </span>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  id="login-password"
+                  className="input-base"
+                  style={{ paddingLeft: '38px' }}
+                />
+              </div>
+            </div>
+
+            {error && (
+              <div
+                className="animate-slideDown"
+                style={{
+                  borderRadius: '8px', padding: '10px 14px',
+                  fontSize: '0.82rem',
+                  background: 'var(--color-danger-bg)',
+                  color: 'var(--color-danger)',
+                  border: '1px solid var(--color-danger-border)',
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                }}
+              >
+                <span>⚠</span> {error}
+              </div>
+            )}
+
+            <button
+              id="login-submit"
+              type="submit"
+              disabled={loading}
+              style={{
+                marginTop: '8px',
+                width: '100%',
+                padding: '13px 24px',
+                borderRadius: '10px',
+                border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                fontFamily: 'var(--font-body)',
+                fontSize: '0.9rem',
+                fontWeight: 700,
+                color: '#FFFFFF',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                transition: 'all 0.2s ease',
+                opacity: loading ? 0.7 : 1,
+                background: loading
+                  ? 'var(--color-primary-dim)'
+                  : 'linear-gradient(135deg, #E8901A 0%, #D07D10 100%)',
+                boxShadow: loading ? 'none' : '0 4px 16px rgba(232,144,26,0.35)',
+                letterSpacing: '0.01em',
+              }}
+              onMouseEnter={e => {
+                if (!loading) {
+                  (e.currentTarget as HTMLButtonElement).style.background = 'linear-gradient(135deg, #D07D10 0%, #C07008 100%)'
+                    ; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 6px 20px rgba(232,144,26,0.45)'
+                    ; (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'
+                }
+              }}
+              onMouseLeave={e => {
+                if (!loading) {
+                  (e.currentTarget as HTMLButtonElement).style.background = 'linear-gradient(135deg, #E8901A 0%, #D07D10 100%)'
+                    ; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 16px rgba(232,144,26,0.35)'
+                    ; (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'
+                }
+              }}
+            >
+              {loading ? (
+                <>
+                  <span style={{
+                    width: '16px', height: '16px', border: '2px solid rgba(255,255,255,0.4)',
+                    borderTopColor: '#fff', borderRadius: '50%',
+                    animation: 'spin-slow 0.8s linear infinite',
+                  }} />
+                  Autenticando...
+                </>
+              ) : (
+                <>
+                  Entrar
+                  <ArrowRight size={16} />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Footer do form */}
+          <div style={{
+            marginTop: '32px', paddingTop: '24px',
+            borderTop: '1px solid var(--color-border)',
+            textAlign: 'center',
+          }}>
+            <p style={{ fontSize: '0.78rem', color: 'var(--color-muted-light)', margin: 0 }}>
+              Problemas para acessar?{' '}
+              <span style={{ color: 'var(--color-primary)', cursor: 'pointer', fontWeight: 600 }}>
+                Fale com o suporte
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Responsive: hide left panel on small screens ── */}
+      <style>{`
+        @media (max-width: 768px) {
+          .login-panel-left { display: none !important; }
+        }
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   )
 }

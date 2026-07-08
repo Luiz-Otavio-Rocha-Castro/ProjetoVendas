@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useCallback, ReactNode } fr
 
 interface AuthState {
   isAuthenticated: boolean
-  user: { name: string; email: string; role: string; avatar: string } | null
+  user: { id: number; name: string; email: string; role: string; avatar: string } | null
 }
 
 interface AuthContextData extends AuthState {
@@ -38,12 +38,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const response = await api.post('/auth/login', { email, password })
         
         const token = response.data.token
-        if (token) {
+        const vendedor = response.data.vendedor
+        if (token && vendedor) {
           localStorage.setItem('token', token)
           
+          const nomeVendedor = vendedor.nome || 'Vendedor'
+          const partesNome = nomeVendedor.trim().split(' ')
+          const avatar = partesNome.length > 1 
+            ? (partesNome[0][0] + partesNome[1][0]).toUpperCase()
+            : nomeVendedor.substring(0, 2).toUpperCase()
+
           const next: AuthState = {
             isAuthenticated: true,
-            user: { ...MOCK_USER, email }, 
+            user: { 
+              id: vendedor.id,
+              name: nomeVendedor, 
+              email: vendedor.email || email,
+              role: 'Vendedor',
+              avatar: avatar
+            }, 
           }
           sessionStorage.setItem(SESSION_KEY, JSON.stringify(next))
           setState(next)
