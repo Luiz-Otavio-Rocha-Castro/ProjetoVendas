@@ -96,8 +96,8 @@ public class WebSecurity {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Coloque aqui a porta onde o seu frontend está rodando
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5174", "http://localhost:5173")); 
+        // Permite qualquer domínio de frontend acessar a API (seguro com JWT e necessário para o deploy)
+        configuration.setAllowedOriginPatterns(Arrays.asList("*")); 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);

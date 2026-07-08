@@ -13,7 +13,6 @@ import com.minhavendas.vendas.dto.AuthenticationDTO;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:5174")
 public class AuthController {
 
     @Autowired
