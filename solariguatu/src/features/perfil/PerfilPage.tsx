@@ -2,8 +2,10 @@ import { useState, useEffect, type FormEvent } from 'react'
 import {
   User, Mail, MapPin, Target, Zap,
   Save, Lock, Eye, EyeOff, TrendingUp,
-  CheckCircle2, Edit3,
+  CheckCircle2, Edit3, LogOut,
 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../hooks/useAuth'
 import { usePerfil } from '../../hooks/usePerfil'
 import { useToast } from '../../contexts/ToastContext'
 import Input from '../../components/ui/Input'
@@ -43,6 +45,8 @@ function Section({ title, icon, children }: { title: string; icon: React.ReactNo
 
 export default function PerfilPage() {
   const { perfil, saving, loading, updatePerfil } = usePerfil()
+  const { logout } = useAuth()
+  const navigate = useNavigate()
   const { toast } = useToast()
 
   // Form state
@@ -350,6 +354,20 @@ export default function PerfilPage() {
               </div>
             </form>
           </Section>
+
+          {/* Sair da Conta (Mobile) */}
+          <div className="flex justify-center pt-2 pb-12 lg:hidden">
+            <Button
+              type="button"
+              variant="danger"
+              size="md"
+              leftIcon={<LogOut size={16} />}
+              onClick={() => { logout(); navigate('/login') }}
+              style={{ width: '100%', maxWidth: '280px' }}
+            >
+              Sair do Sistema
+            </Button>
+          </div>
         </div>
       </div>
     </div>

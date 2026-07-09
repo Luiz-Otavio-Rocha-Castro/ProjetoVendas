@@ -130,7 +130,7 @@ export default function NovoContratoModal({ open, onClose, onSave, initialData, 
       subtitle={isEdit ? 'Atualize os dados do contrato' : 'Preencha os dados do cliente e da venda'}
       width="640px"
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5 pb-24 md:pb-0">
 
         {/* ── Seção: Selecionar Cliente Existente ── */}
         {!isEdit && (

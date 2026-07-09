@@ -83,6 +83,7 @@ public class WebSecurity {
             // (como /auth/login ou /auth/cadastro) está TOTALMENTE LIBERADA para qualquer um acessar sem token.
             .authorizeHttpRequests(auth ->  auth.requestMatchers("/auth/**").permitAll()
                                    .requestMatchers("/api/vendas-vendedor/**").permitAll()
+                                   .requestMatchers("/api/health").permitAll()
                                 .anyRequest().authenticated());
             
         http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class);
