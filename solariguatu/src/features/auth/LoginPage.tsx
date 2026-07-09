@@ -32,7 +32,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#F4F6FA' }}>
+    <div className="login-container" style={{ display: 'flex', minHeight: '100vh', background: '#F4F6FA' }}>
 
       {/* ── Lado Esquerdo: Brand Panel ── */}
       <div
@@ -106,7 +106,7 @@ export default function LoginPage() {
           </p>
 
           {/* Feature pills */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div className="login-features" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {[
               { icon: <Zap size={14} />, text: 'Gerencie contratos em tempo real' },
               { icon: <Sun size={14} />, text: 'Acompanhe metas de kWp e faturamento' },
@@ -134,7 +134,7 @@ export default function LoginPage() {
         </div>
 
         {/* Bottom copyright */}
-        <p style={{
+        <p className="login-copyright" style={{
           position: 'absolute', bottom: '24px',
           fontSize: '0.72rem', color: 'rgba(255,255,255,0.28)',
           fontFamily: 'var(--font-body)',
@@ -144,7 +144,7 @@ export default function LoginPage() {
       </div>
 
       {/* ── Lado Direito: Formulário ── */}
-      <div style={{
+      <div className="login-panel-right" style={{
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
@@ -326,10 +326,25 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* ── Responsive: hide left panel on small screens ── */}
+      {/* ── Responsive: stack panels vertically on mobile ── */}
       <style>{`
         @media (max-width: 768px) {
-          .login-panel-left { display: none !important; }
+          .login-container { flex-direction: column !important; }
+          .login-panel-left { 
+            flex: none !important; 
+            padding: 30px 20px 24px !important; 
+            min-height: auto !important;
+          }
+          .login-panel-left img { height: 60px !important; margin-bottom: 12px !important; }
+          .login-panel-left h1 { font-size: 1.6rem !important; margin-bottom: 4px !important; }
+          .login-panel-left > div > p { margin-bottom: 0 !important; font-size: 0.85rem !important; }
+          .login-features { display: none !important; }
+          .login-copyright { display: none !important; }
+          .login-panel-right { 
+            padding: 50px 24px 30px !important; 
+            flex: 1 !important;
+            justify-content: flex-start !important;
+          }
         }
         @keyframes spin-slow {
           from { transform: rotate(0deg); }

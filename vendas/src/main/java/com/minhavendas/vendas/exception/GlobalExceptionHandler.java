@@ -2,15 +2,17 @@ package com.minhavendas.vendas.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-
+import java.util.NoSuchElementException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 1. Captura erros de argumentos inválidos (ex: IDs nulos ou regras de negócio validadas por você)
+    // 1. Argumento inválido
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorMessage> handlerIllegalArgumentException(IllegalArgumentException ex) {
         ErrorMessage erro = new ErrorMessage(
@@ -21,20 +23,51 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(erro, HttpStatus.BAD_REQUEST);
     }
 
-    // 2. CAPTURA ERRO DE NOT FOUND (Se você lançar uma exceção customizada ou ResourceNotFoundException)
-    // Dica: Se no seu Service você usa algo como .orElseThrow(() -> new RuntimeException("Não encontrado")), 
-    // você pode capturar RuntimeException aqui para devolver 404 Status.
+    // 2. E-mail não encontrado no banco (Optional.get() vazio)
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<ErrorMessage> handlerNoSuchElementException(NoSuchElementException ex) {
+        ErrorMessage erro = new ErrorMessage(
+            HttpStatus.UNAUTHORIZED.value(),
+            "Não Autorizado",
+            "E-mail ou senha incorretos."
+        );
+        return new ResponseEntity<>(erro, HttpStatus.UNAUTHORIZED);
+    }
+
+    // 3. Senha errada
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorMessage> handlerBadCredentialsException(BadCredentialsException ex) {
+        ErrorMessage erro = new ErrorMessage(
+            HttpStatus.UNAUTHORIZED.value(),
+            "Não Autorizado",
+            "E-mail ou senha incorretos."
+        );
+        return new ResponseEntity<>(erro, HttpStatus.UNAUTHORIZED);
+    }
+
+    // 4. Outros erros de autenticação do Spring Security
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorMessage> handlerAuthenticationException(AuthenticationException ex) {
+        ErrorMessage erro = new ErrorMessage(
+            HttpStatus.UNAUTHORIZED.value(),
+            "Não Autorizado",
+            "E-mail ou senha incorretos."
+        );
+        return new ResponseEntity<>(erro, HttpStatus.UNAUTHORIZED);
+    }
+
+    // 5. Outros erros de runtime
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorMessage> handlerRuntimeException(RuntimeException ex) {
         ErrorMessage erro = new ErrorMessage(
-            HttpStatus.NOT_FOUND.value(),
-            "Recurso Não Encontrado",
+            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+            "Erro Interno",
             ex.getMessage()
         );
-        return new ResponseEntity<>(erro, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(erro, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // 3. O plano de contingência para qualquer outro erro bizarro não mapeado
+    // 6. Plano de contingência
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorMessage> handlerGenericException(Exception ex) {
         ErrorMessage erro = new ErrorMessage(
@@ -45,5 +78,3 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(erro, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
-
-

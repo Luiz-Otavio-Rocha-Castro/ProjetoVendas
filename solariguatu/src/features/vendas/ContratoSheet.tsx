@@ -270,7 +270,7 @@ export default function ContratoSheet({ contrato, onClose }: Props) {
             )}
 
             {/* ── Scrollable content ── */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '18px 20px', paddingBottom: '88px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
               {/* Dados do Cliente */}
               <section>

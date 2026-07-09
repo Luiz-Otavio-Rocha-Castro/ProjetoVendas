@@ -1,6 +1,6 @@
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import {
-  LayoutDashboard, FileText, Sun, LogOut,
+  LayoutDashboard, FileText, LogOut,
   Zap, Bell, AlertCircle, FolderOpen, UserCircle, ChevronRight,
 } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
@@ -9,9 +9,9 @@ import ToastContainer from './Toast'
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/vendas', icon: FileText, label: 'Contratos' },
-  { to: '/pagamentos', icon: AlertCircle, label: 'Pag. Pendentes' },
+  { to: '/pagamentos', icon: AlertCircle, label: 'Pagamentos' },
   { to: '/documentos', icon: FolderOpen, label: 'Documentos' },
-  { to: '/perfil', icon: UserCircle, label: 'Meu Perfil' },
+  { to: '/perfil', icon: UserCircle, label: 'Perfil' },
 ]
 
 const PAGE_TITLES: Record<string, string> = {
@@ -44,21 +44,12 @@ export default function AppLayout() {
   const firstName = user?.name?.split(' ')[0] ?? 'Vendedor'
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'var(--color-background)' }}>
+    <div className="app-shell">
 
       {/* ════════════════════════════════
-          SIDEBAR — navy do logotipo
+          SIDEBAR — desktop only
       ════════════════════════════════ */}
-      <aside style={{
-        width: '240px',
-        flexShrink: 0,
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        background: 'var(--color-navy)',
-        position: 'relative',
-        zIndex: 10,
-      }}>
+      <aside className="app-sidebar">
 
         {/* ── Logo ── */}
         <div style={{
@@ -99,6 +90,7 @@ export default function AppLayout() {
                 alignItems: 'center',
                 gap: '10px',
                 padding: '9px 12px',
+                minHeight: '44px',
                 borderRadius: '9px',
                 marginBottom: '2px',
                 fontSize: '0.845rem',
@@ -174,8 +166,6 @@ export default function AppLayout() {
           </div>
         </div>
 
-
-
         {/* ── User block ── */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: '10px',
@@ -200,6 +190,7 @@ export default function AppLayout() {
           <button
             onClick={handleLogout}
             title="Sair"
+            className="touch-target"
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
               padding: '6px', borderRadius: '7px',
@@ -224,33 +215,46 @@ export default function AppLayout() {
       {/* ════════════════════════════════
           MAIN CONTENT
       ════════════════════════════════ */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      <div className="app-content">
 
         {/* ── Topbar ── */}
         <header style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 28px',
+          padding: '0 20px',
           height: '60px', flexShrink: 0,
           background: 'var(--color-surface)',
           borderBottom: '1px solid var(--color-border)',
           boxShadow: '0 1px 3px rgba(15,25,41,0.05)',
         }}>
-          {/* Breadcrumb / title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{
-              width: '4px', height: '18px', borderRadius: '2px',
-              background: 'linear-gradient(180deg, #E8901A, #D07D10)',
-            }} />
-            <div>
-              <h2 style={{
-                fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-foreground)',
-                margin: 0, fontFamily: 'var(--font-display)', letterSpacing: '-0.01em',
-              }}>
-                {pageTitle}
-              </h2>
-              <p style={{ fontSize: '0.72rem', color: 'var(--color-muted)', margin: 0 }}>
-                {getGreeting()}, {firstName}! 👋
-              </p>
+          {/* Logo (mobile only) + title */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {/* Logo só aparece no mobile (quando sidebar está oculta) */}
+            <img
+              src="/logo.jpg"
+              alt="SolarIguatu"
+              style={{
+                height: '32px',
+                objectFit: 'contain',
+              }}
+              className="mobile-logo"
+            />
+            {/* Título com barra — oculto no mobile pela classe topbar-title */}
+            <div className="topbar-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{
+                width: '4px', height: '18px', borderRadius: '2px',
+                background: 'linear-gradient(180deg, #E8901A, #D07D10)',
+              }} />
+              <div>
+                <h2 style={{
+                  fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-foreground)',
+                  margin: 0, fontFamily: 'var(--font-display)', letterSpacing: '-0.01em',
+                }}>
+                  {pageTitle}
+                </h2>
+                <p style={{ fontSize: '0.72rem', color: 'var(--color-muted)', margin: 0 }}>
+                  {getGreeting()}, {firstName}! 👋
+                </p>
+              </div>
             </div>
           </div>
 
@@ -258,6 +262,7 @@ export default function AppLayout() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {/* Notification bell */}
             <button
+              className="touch-target"
               style={{
                 position: 'relative', padding: '8px', borderRadius: '9px',
                 border: '1px solid var(--color-border)',
@@ -289,8 +294,9 @@ export default function AppLayout() {
             <button
               onClick={() => navigate('/perfil')}
               title="Meu Perfil"
+              className="touch-target"
               style={{
-                width: '34px', height: '34px', borderRadius: '50%',
+                width: '36px', height: '36px', borderRadius: '50%',
                 background: 'linear-gradient(135deg, #E8901A, #D07D10)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: '0.75rem', fontWeight: 700, color: '#fff',
@@ -314,14 +320,35 @@ export default function AppLayout() {
         </header>
 
         {/* ── Page content ── */}
-        <main style={{
-          flex: 1, overflowY: 'auto',
-          padding: '28px',
-          background: 'var(--color-background)',
-        }} className="mesh-bg">
+        <main className="app-main mesh-bg">
           <Outlet />
         </main>
       </div>
+
+      {/* ════════════════════════════════
+          BOTTOM NAV — mobile only
+      ════════════════════════════════ */}
+      <nav className="bottom-nav">
+        {navItems.map(({ to, icon: Icon, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              `bottom-nav-item${isActive ? ' active' : ''}`
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <Icon
+                  size={20}
+                  strokeWidth={isActive ? 2.2 : 1.7}
+                />
+                <span>{label}</span>
+              </>
+            )}
+          </NavLink>
+        ))}
+      </nav>
 
       {/* ── Global Toast ── */}
       <ToastContainer />
@@ -330,6 +357,15 @@ export default function AppLayout() {
         @keyframes pulse-dot {
           0%, 100% { box-shadow: 0 0 0 3px rgba(74,222,128,0.20); }
           50%       { box-shadow: 0 0 0 5px rgba(74,222,128,0.30); }
+        }
+        /* Logo mobile: oculta no desktop (sidebar mostra o logo lá) */
+        .mobile-logo {
+          display: none;
+        }
+        @media (max-width: 768px) {
+          .mobile-logo {
+            display: block;
+          }
         }
       `}</style>
     </div>

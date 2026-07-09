@@ -115,12 +115,12 @@ export default function VendasPage() {
       </div>
 
       {/* ── Cards de indicadores ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: '14px' }}>
+      <div className="vendas-cards-grid">
 
         {/* Valor Total */}
         <div style={{
           ...cardBase,
-          gridColumn: 'span 2',
+          gridColumn: 'var(--card-wide-span)',
           padding: '18px',
           borderColor: 'var(--color-primary-border)',
           boxShadow: '0 4px 16px var(--color-primary-glow)',
@@ -158,7 +158,7 @@ export default function VendasPage() {
         {/* Comissão */}
         <div style={{
           ...cardBase,
-          gridColumn: 'span 2',
+          gridColumn: 'var(--card-wide-span)',
           padding: '18px',
           borderColor: 'var(--color-success-border)',
           boxShadow: '0 4px 16px rgba(22,163,74,0.10)',
