@@ -17,7 +17,7 @@ export function useVendas() {
   }, []) // Executa uma única vez ao abrir
 
   const [busca, setBusca] = useState('')
-  const [filtroStatus, setFiltroStatus] = useState<ContratoStatus | 'Todos'>('Todos')
+  const [mesReferencia, setMesReferencia] = useState<Date>(new Date())
   const [pagina, setPagina] = useState(1)
   const itensPorPagina = 8
 
@@ -28,10 +28,15 @@ export function useVendas() {
         c.cliente.toLowerCase().includes(busca.toLowerCase()) ||
         c.id.toLowerCase().includes(busca.toLowerCase()) ||
         c.produto.toLowerCase().includes(busca.toLowerCase())
-      const matchStatus = filtroStatus === 'Todos' || c.status === filtroStatus
-      return matchBusca && matchStatus
+
+      const d = new Date(c.dataCriacao)
+      const matchMes = 
+        d.getMonth() === mesReferencia.getMonth() && 
+        d.getFullYear() === mesReferencia.getFullYear()
+
+      return matchBusca && matchMes
     })
-  }, [contratos, busca, filtroStatus])
+  }, [contratos, busca, mesReferencia])
 
   const totalPaginas = Math.max(1, Math.ceil(filtrados.length / itensPorPagina))
   const paginaAtual = Math.min(pagina, totalPaginas)
@@ -40,14 +45,14 @@ export function useVendas() {
     paginaAtual * itensPorPagina
   )
 
-  // Métricas gerais (sobre TODOS os contratos, não só os filtrados)
+  // Métricas gerais (sobre TODOS os contratos filtrados pelo mês)
   const totalVendas = useMemo(
-    () => contratos.reduce((s, c) => s + c.valorTotal, 0),
-    [contratos]
+    () => filtrados.reduce((s, c) => s + c.valorTotal, 0),
+    [filtrados]
   )
   const totalComissao = useMemo(
-    () => contratos.reduce((s, c) => s + c.comissao, 0),
-    [contratos]
+    () => filtrados.reduce((s, c) => s + c.comissao, 0),
+    [filtrados]
   )
   const contratosPendentes = useMemo(
     () => contratos.filter((c) => c.status === 'Pendente'),
@@ -101,8 +106,8 @@ export function useVendas() {
     filtrados,
     busca,
     setBusca,
-    filtroStatus,
-    setFiltroStatus: (s: ContratoStatus | 'Todos') => { setFiltroStatus(s); setPagina(1) },
+    mesReferencia,
+    setMesReferencia: (d: Date) => { setMesReferencia(d); setPagina(1) },
     pagina: paginaAtual,
     setPagina,
     totalPaginas,

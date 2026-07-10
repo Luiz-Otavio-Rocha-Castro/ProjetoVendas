@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react'
 import {
-  Plus, Search, FileText,
+  Plus, Search,
   ChevronLeft, ChevronRight, DollarSign,
-  TrendingUp, CheckCircle2, Edit2, Trash2,
+  TrendingUp, Edit2, Trash2,
 } from 'lucide-react'
 import { useVendas } from '../../hooks/useVendas'
 import Button from '../../components/ui/Button'
 import NovoContratoModal from './NovoContratoModal'
 import ContratoSheet from './ContratoSheet'
 import type { Contrato, ContratoStatus } from './mockVendas'
-import { STATUS_OPTIONS } from './mockVendas'
 import { api } from '../../services/api';
 
 const STATUS_STYLE: Record<ContratoStatus, { color: string; bg: string; border: string; dot: string; label: string }> = {
@@ -26,7 +25,6 @@ const fmt = (v: number) =>
 const fmtFull = (v: number) =>
   v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
-type AllStatus = ContratoStatus | 'Todos'
 
 const cardBase: React.CSSProperties = {
   background: 'var(--color-surface)',
@@ -38,7 +36,7 @@ const cardBase: React.CSSProperties = {
 export default function VendasPage() {
   const {
     itensPagina, filtrados, busca, setBusca,
-    filtroStatus, setFiltroStatus, pagina, setPagina,
+    mesReferencia, setMesReferencia, pagina, setPagina,
     totalPaginas, adicionarContrato, removerContrato, editarContrato,
     total, totalVendas, totalComissao,
     contratos,
@@ -49,7 +47,6 @@ export default function VendasPage() {
   const [sheetContrato, setSheetContrato] = useState<Contrato | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
 
-  const filterOptions: AllStatus[] = ['Todos', ...STATUS_OPTIONS]
 
   const handleEditar = (c: Contrato, e: React.MouseEvent) => {
     e.stopPropagation()
@@ -84,8 +81,6 @@ export default function VendasPage() {
     setEditContrato(null)
     setModalOpen(false)
   }
-
-  const totalAprovados = contratos.filter((c) => c.status === 'Aprovado').length
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }} className="animate-fadeIn">
@@ -193,24 +188,7 @@ export default function VendasPage() {
           </div>
         </div>
 
-        {/* Mini-cards */}
-        {[
-          { icon: <FileText size={14} />, label: 'Total', value: contratos.length, color: 'var(--color-foreground)' },
-          { icon: <CheckCircle2 size={14} />, label: 'Aprovados', value: totalAprovados, color: 'var(--color-success)' },
-        ].map((item, i) => (
-          <div key={i} style={{
-            ...cardBase, padding: '14px 16px',
-            display: 'flex', alignItems: 'center', gap: '10px',
-          }}>
-            <span style={{ color: item.color }}>{item.icon}</span>
-            <div>
-              <p style={{ fontSize: '0.72rem', color: 'var(--color-muted)', margin: '0 0 2px' }}>{item.label}</p>
-              <p style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, color: item.color, fontFamily: 'var(--font-display)' }}>
-                {item.value}
-              </p>
-            </div>
-          </div>
-        ))}
+
       </div>
 
       {/* ── Filters ── */}
@@ -232,29 +210,32 @@ export default function VendasPage() {
           />
         </div>
 
-        {/* Status filters */}
+        {/* Month selector */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-          {filterOptions.map((s) => {
-            const active = filtroStatus === s
-            return (
-              <button
-                key={s}
-                onClick={() => setFiltroStatus(s)}
-                style={{
-                  padding: '6px 12px', borderRadius: '8px',
-                  fontSize: '0.78rem', fontWeight: 600,
-                  fontFamily: 'var(--font-body)',
-                  border: active ? '1.5px solid var(--color-primary)' : '1.5px solid var(--color-border)',
-                  background: active ? 'var(--color-primary-light)' : 'var(--color-surface)',
-                  color: active ? 'var(--color-primary)' : 'var(--color-muted)',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {s === 'Pendente' ? 'Pag. Pendente' : s}
-              </button>
-            )
-          })}
+          <input
+            type="month"
+            value={`${mesReferencia.getFullYear()}-${String(mesReferencia.getMonth() + 1).padStart(2, '0')}`}
+            onChange={(e) => {
+              if (e.target.value) {
+                const [y, m] = e.target.value.split('-')
+                setMesReferencia(new Date(Number(y), Number(m) - 1, 1))
+              }
+            }}
+            style={{
+              padding: '8px 12px',
+              borderRadius: '8px',
+              border: '1.5px solid var(--color-border)',
+              background: 'var(--color-surface)',
+              color: 'var(--color-foreground)',
+              fontSize: '0.82rem',
+              fontWeight: 600,
+              fontFamily: 'var(--font-body)',
+              cursor: 'pointer',
+              outline: 'none',
+              transition: 'all 0.15s ease',
+            }}
+            title="Selecionar Mês"
+          />
         </div>
       </div>
 
@@ -473,6 +454,7 @@ export default function VendasPage() {
         onSave={handleSave}
         initialData={editContrato ?? undefined}
         editId={editContrato?.id}
+        contratos={contratos}
       />
 
       {/* ── Gaveta Lateral de Detalhes ── */}

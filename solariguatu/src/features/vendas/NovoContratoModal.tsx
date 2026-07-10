@@ -16,10 +16,6 @@ const empty: Dados = {
   status: 'Pendente', paineis: 0, financiamento: 'Financiado',
 }
 
-// Lista de clientes únicos do mock para o autocomplete
-const clientesExistentes = Array.from(
-  new Map(mockContratos.map((c) => [c.cpfCnpj, c])).values()
-).map((c) => ({ label: c.cliente, value: c.cpfCnpj, data: c }))
 
 interface Props {
   open: boolean
@@ -27,15 +23,21 @@ interface Props {
   onSave: (d: Dados) => void
   initialData?: Partial<Contrato> // para modo edição
   editId?: string
+  contratos: Contrato[]
 }
 
-export default function NovoContratoModal({ open, onClose, onSave, initialData, editId }: Props) {
+export default function NovoContratoModal({ open, onClose, onSave, initialData, editId, contratos }: Props) {
   const isEdit = Boolean(editId)
   const [form, setForm] = useState<Dados>(empty)
   const [errors, setErrors] = useState<Partial<Record<keyof Dados, string>>>({})
   const [saving, setSaving] = useState(false)
   const [clienteSelecionado, setClienteSelecionado] = useState<string>('') // cpfCnpj do cliente
   const [comissaoPct, setComissaoPct] = useState<number | string>(5) // default 5%
+
+  // Lista de clientes únicos a partir da prop contratos (dados reais do sistema)
+  const clientesExistentes = Array.from(
+    new Map(contratos.map((c) => [c.cpfCnpj, c])).values()
+  ).map((c) => ({ label: c.cliente, value: c.cpfCnpj, data: c }))
 
   // Popula formulário com dados iniciais (modo edição)
   useEffect(() => {
