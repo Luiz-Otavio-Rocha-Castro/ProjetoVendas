@@ -8,6 +8,7 @@ import VendasPage from './features/vendas/VendasPage'
 import PagamentosPendentesPage from './features/pagamentos/PagamentosPendentesPage'
 import DocumentosPage from './features/documentos/DocumentosPage'
 import PerfilPage from './features/perfil/PerfilPage'
+import VisitasPage from './features/visitas/VisitasPage'
 
 export default function App() {
   const { isAuthenticated } = useAuth()
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="vendas"     element={<VendasPage />} />
           <Route path="pagamentos" element={<PagamentosPendentesPage />} />
           <Route path="documentos" element={<DocumentosPage />} />
+          <Route path="visitas"    element={<VisitasPage />} />
           <Route path="perfil"     element={<PerfilPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

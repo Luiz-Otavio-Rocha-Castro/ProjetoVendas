@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import {
   Plus, Search,
   ChevronLeft, ChevronRight, DollarSign,
@@ -44,8 +45,23 @@ export default function VendasPage() {
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editContrato, setEditContrato] = useState<Contrato | null>(null)
+  const [initialNovoData, setInitialNovoData] = useState<Partial<Contrato> | undefined>(undefined)
   const [sheetContrato, setSheetContrato] = useState<Contrato | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+  const location = useLocation()
+
+  // Checa se veio da página de Visitas com dados pré-preenchidos
+  useEffect(() => {
+    if (location.state?.novoContrato && location.state?.cliente) {
+      setInitialNovoData({ 
+        cliente: location.state.cliente,
+        cpfCnpj: location.state.cpfCnpj || ''
+      })
+      setModalOpen(true)
+      // Limpa o state do history para não abrir o modal de novo se atualizar a página
+      window.history.replaceState({}, '')
+    }
+  }, [location.state])
 
 
   const handleEditar = (c: Contrato, e: React.MouseEvent) => {
@@ -79,6 +95,7 @@ export default function VendasPage() {
 
   const handleModalClose = () => {
     setEditContrato(null)
+    setInitialNovoData(undefined)
     setModalOpen(false)
   }
 
@@ -103,7 +120,7 @@ export default function VendasPage() {
           variant="primary"
           size="md"
           leftIcon={<Plus size={15} />}
-          onClick={() => { setEditContrato(null); setModalOpen(true) }}
+          onClick={() => { setEditContrato(null); setInitialNovoData(undefined); setModalOpen(true) }}
         >
           Novo Contrato
         </Button>
@@ -452,7 +469,7 @@ export default function VendasPage() {
         open={modalOpen}
         onClose={handleModalClose}
         onSave={handleSave}
-        initialData={editContrato ?? undefined}
+        initialData={editContrato ?? initialNovoData ?? undefined}
         editId={editContrato?.id}
         contratos={contratos}
       />

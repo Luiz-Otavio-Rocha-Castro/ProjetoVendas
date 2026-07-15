@@ -1,17 +1,18 @@
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, FileText, LogOut,
-  Zap, Bell, AlertCircle, FolderOpen, UserCircle, ChevronRight,
+  Zap, Bell, AlertCircle, FolderOpen, UserCircle, ChevronRight, MapPin,
 } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import ToastContainer from './Toast'
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/vendas', icon: FileText, label: 'Contratos' },
-  { to: '/pagamentos', icon: AlertCircle, label: 'Pagamentos' },
-  { to: '/documentos', icon: FolderOpen, label: 'Documentos' },
-  { to: '/perfil', icon: UserCircle, label: 'Perfil' },
+  { to: '/vendas',     icon: FileText,        label: 'Contratos' },
+  { to: '/pagamentos', icon: AlertCircle,     label: 'Pagamentos' },
+  { to: '/documentos', icon: FolderOpen,      label: 'Documentos' },
+  { to: '/visitas',    icon: MapPin,          label: 'Visitas' },
+  { to: '/perfil',     icon: UserCircle,      label: 'Perfil' },
 ]
 
 const PAGE_TITLES: Record<string, string> = {
@@ -19,6 +20,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/vendas': 'Contratos',
   '/pagamentos': 'Pagamentos Pendentes',
   '/documentos': 'Documentos',
+  '/visitas':    'Visitas & Prospectos',
   '/perfil': 'Meu Perfil',
 }
 

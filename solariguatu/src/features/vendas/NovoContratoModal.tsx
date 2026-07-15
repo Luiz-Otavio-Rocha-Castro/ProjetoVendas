@@ -48,7 +48,7 @@ export default function NovoContratoModal({ open, onClose, onSave, initialData, 
       } else {
         setComissaoPct(5)
       }
-      setClienteSelecionado('')
+      setClienteSelecionado(initialData.cpfCnpj || '')
     } else if (open && !initialData) {
       setForm(empty)
       setComissaoPct(5)
