@@ -38,6 +38,8 @@ public class Venda {
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
+    private Integer vendedorId;
+
     //#endregion
 
     //#region gets e setts
@@ -127,6 +129,9 @@ public class Venda {
     public void setSaldoDevedor(Double saldoDevedor) {
         this.saldoDevedor = saldoDevedor;
     }
+
+    public Integer getVendedorId() { return vendedorId; }
+    public void setVendedorId(Integer vendedorId) { this.vendedorId = vendedorId; }
 
     //#endregion
 }

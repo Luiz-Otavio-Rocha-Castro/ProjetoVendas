@@ -10,11 +10,19 @@ public class VendedorDTO {
 
     private String senha;
 
+    private String senhaAntiga;
+
     private String regiaoAtuacao;
 
     private Double metaMensal;
 
     private Double metaKwp;
+
+    private Double faturamentoAtual;
+
+    private Double kwpAtual;
+
+    private Integer contratosAtual;
 
     //#endregion
 
@@ -51,6 +59,14 @@ public class VendedorDTO {
         this.senha = senha;
     }
 
+    public String getSenhaAntiga() {
+        return senhaAntiga;
+    }
+
+    public void setSenhaAntiga(String senhaAntiga) {
+        this.senhaAntiga = senhaAntiga;
+    }
+
     public String getRegiaoAtuacao() {
         return regiaoAtuacao;
     }
@@ -75,6 +91,29 @@ public class VendedorDTO {
         this.metaKwp = metaKwp;
     }
 
+    public Double getFaturamentoAtual() {
+        return faturamentoAtual;
+    }
+
+    public void setFaturamentoAtual(Double faturamentoAtual) {
+        this.faturamentoAtual = faturamentoAtual;
+    }
+
+    public Double getKwpAtual() {
+        return kwpAtual;
+    }
+
+    public void setKwpAtual(Double kwpAtual) {
+        this.kwpAtual = kwpAtual;
+    }
+
+    public Integer getContratosAtual() {
+        return contratosAtual;
+    }
+
+    public void setContratosAtual(Integer contratosAtual) {
+        this.contratosAtual = contratosAtual;
+    }
     
     //#endregion
 

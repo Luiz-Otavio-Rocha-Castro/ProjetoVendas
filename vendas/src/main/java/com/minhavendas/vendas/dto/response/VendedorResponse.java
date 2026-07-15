@@ -13,6 +13,12 @@ public class VendedorResponse {
     private Double metaMensal;
 
     private Double metaKwp;
+
+    private Double faturamentoAtual;
+
+    private Double kwpAtual;
+
+    private Integer contratosAtual;
     //#endregion
 
     //#region GEts e setters
@@ -64,7 +70,30 @@ public class VendedorResponse {
         this.metaKwp = metaKwp;
     }
 
-    
+    public Double getFaturamentoAtual() {
+        return faturamentoAtual;
+    }
+
+    public void setFaturamentoAtual(Double faturamentoAtual) {
+        this.faturamentoAtual = faturamentoAtual;
+    }
+
+    public Double getKwpAtual() {
+        return kwpAtual;
+    }
+
+    public void setKwpAtual(Double kwpAtual) {
+        this.kwpAtual = kwpAtual;
+    }
+
+    public Integer getContratosAtual() {
+        return contratosAtual;
+    }
+
+    public void setContratosAtual(Integer contratosAtual) {
+        this.contratosAtual = contratosAtual;
+    }
+
     //#endregion
 }
 

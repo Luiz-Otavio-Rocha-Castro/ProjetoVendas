@@ -1,9 +1,10 @@
 import { useState, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Mail, Lock, ArrowRight, Zap, Sun } from 'lucide-react'
+import { Mail, Lock, ArrowRight, Zap, Sun, UserPlus, User } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
+import { api } from '../../services/api'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -13,10 +14,19 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+
+  // Cadastro state
+  const [isRegistering, setIsRegistering] = useState(false)
+  const [registerName, setRegisterName] = useState('')
+  const [registerEmail, setRegisterEmail] = useState('')
+  const [registerPassword, setRegisterPassword] = useState('')
+  const [registerConfirmPassword, setRegisterConfirmPassword] = useState('')
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
     if (!email.trim() || !password.trim()) {
       setError('Preencha todos os campos.')
       return
@@ -28,6 +38,39 @@ export default function LoginPage() {
       navigate('/dashboard')
     } else {
       setError('E-mail ou senha incorretos.')
+    }
+  }
+
+  const handleRegister = async (e: FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setSuccess('')
+    if (!registerName.trim() || !registerEmail.trim() || !registerPassword.trim() || !registerConfirmPassword.trim()) {
+      setError('Preencha todos os campos.')
+      return
+    }
+    if (registerPassword !== registerConfirmPassword) {
+      setError('As senhas não coincidem.')
+      return
+    }
+    setLoading(true)
+    try {
+      await api.post('/api/vendas-vendedor', {
+        nome: registerName,
+        email: registerEmail,
+        senha: registerPassword
+      })
+      setSuccess('Cadastro realizado com sucesso! Faça login.')
+      setIsRegistering(false)
+      setRegisterName('')
+      setRegisterEmail('')
+      setRegisterPassword('')
+      setRegisterConfirmPassword('')
+    } catch (err) {
+      console.error(err)
+      setError('Erro ao realizar o cadastro. Tente novamente.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -164,15 +207,63 @@ export default function LoginPage() {
               fontFamily: 'var(--font-display)',
               letterSpacing: '-0.025em',
             }}>
-              Bem-vindo de volta
+              {isRegistering ? 'Crie sua conta' : 'Bem-vindo de volta'}
             </h2>
             <p style={{ fontSize: '0.875rem', color: 'var(--color-muted)', margin: 0 }}>
-              Entre com suas credenciais para continuar
+              {isRegistering ? 'Preencha seus dados para começar' : 'Entre com suas credenciais para continuar'}
             </p>
           </div>
 
           {/* Formulário */}
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <form onSubmit={isRegistering ? handleRegister : handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+            {success && (
+              <div
+                className="animate-slideDown"
+                style={{
+                  borderRadius: '8px', padding: '10px 14px',
+                  fontSize: '0.82rem',
+                  background: 'rgba(34, 197, 94, 0.1)',
+                  color: '#16a34a',
+                  border: '1px solid rgba(34, 197, 94, 0.2)',
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                }}
+              >
+                <span>✓</span> {success}
+              </div>
+            )}
+
+            {isRegistering && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{
+                  fontSize: '0.8rem', fontWeight: 600,
+                  color: 'var(--color-foreground-2)',
+                  fontFamily: 'var(--font-body)',
+                }}>
+                  Nome Completo
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <span style={{
+                    position: 'absolute', left: '12px', top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: 'var(--color-muted-light)',
+                    pointerEvents: 'none', zIndex: 1,
+                    display: 'flex', alignItems: 'center',
+                  }}>
+                    <User size={15} />
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="Seu nome"
+                    value={registerName}
+                    onChange={(e) => setRegisterName(e.target.value)}
+                    autoFocus
+                    className="input-base"
+                    style={{ paddingLeft: '38px' }}
+                  />
+                </div>
+              </div>
+            )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <label style={{
@@ -195,10 +286,9 @@ export default function LoginPage() {
                 <input
                   type="email"
                   placeholder="seu@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={isRegistering ? registerEmail : email}
+                  onChange={(e) => isRegistering ? setRegisterEmail(e.target.value) : setEmail(e.target.value)}
                   autoComplete="email"
-                  autoFocus
                   id="login-email"
                   className="input-base"
                   style={{ paddingLeft: '38px' }}
@@ -227,15 +317,46 @@ export default function LoginPage() {
                 <input
                   type="password"
                   placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="current-password"
+                  value={isRegistering ? registerPassword : password}
+                  onChange={(e) => isRegistering ? setRegisterPassword(e.target.value) : setPassword(e.target.value)}
+                  autoComplete={isRegistering ? "new-password" : "current-password"}
                   id="login-password"
                   className="input-base"
                   style={{ paddingLeft: '38px' }}
                 />
               </div>
             </div>
+
+            {isRegistering && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{
+                  fontSize: '0.8rem', fontWeight: 600,
+                  color: 'var(--color-foreground-2)',
+                  fontFamily: 'var(--font-body)',
+                }}>
+                  Confirmar Senha
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <span style={{
+                    position: 'absolute', left: '12px', top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: 'var(--color-muted-light)',
+                    pointerEvents: 'none', zIndex: 1,
+                    display: 'flex', alignItems: 'center',
+                  }}>
+                    <Lock size={15} />
+                  </span>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    value={registerConfirmPassword}
+                    onChange={(e) => setRegisterConfirmPassword(e.target.value)}
+                    className="input-base"
+                    style={{ paddingLeft: '38px' }}
+                  />
+                </div>
+              </div>
+            )}
 
             {error && (
               <div
@@ -303,8 +424,8 @@ export default function LoginPage() {
                 </>
               ) : (
                 <>
-                  Entrar
-                  <ArrowRight size={16} />
+                  {isRegistering ? 'Cadastrar' : 'Entrar'}
+                  {isRegistering ? <UserPlus size={16} /> : <ArrowRight size={16} />}
                 </>
               )}
             </button>
@@ -316,10 +437,21 @@ export default function LoginPage() {
             borderTop: '1px solid var(--color-border)',
             textAlign: 'center',
           }}>
-            <p style={{ fontSize: '0.78rem', color: 'var(--color-muted-light)', margin: 0 }}>
-              Problemas para acessar?{' '}
-              <span style={{ color: 'var(--color-primary)', cursor: 'pointer', fontWeight: 600 }}>
-                Fale com o suporte
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-muted-light)', margin: 0 }}>
+              {isRegistering ? 'Já tem uma conta?' : 'Ainda não tem conta?'}
+              <span
+                onClick={() => {
+                  setIsRegistering(!isRegistering)
+                  setError('')
+                  setSuccess('')
+                }}
+                style={{
+                  color: 'var(--color-primary)', cursor: 'pointer',
+                  fontWeight: 700, marginLeft: '6px',
+                  textDecoration: 'underline',
+                }}
+              >
+                {isRegistering ? 'Voltar para o Login' : 'Cadastre-se'}
               </span>
             </p>
           </div>

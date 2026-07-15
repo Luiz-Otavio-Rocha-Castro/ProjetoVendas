@@ -1,12 +1,14 @@
 package com.minhavendas.vendas.dto.response;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class VisitaResponse {
     private Integer id;
     private String nomeProspecto;
     private String endereco;
     private LocalDate dataVisita;
+    private LocalTime horaVisita;
     private String cpfCnpj;
     private String anotacoes;
     private String status;
@@ -22,6 +24,9 @@ public class VisitaResponse {
 
     public LocalDate getDataVisita() { return dataVisita; }
     public void setDataVisita(LocalDate dataVisita) { this.dataVisita = dataVisita; }
+
+    public LocalTime getHoraVisita() { return horaVisita; }
+    public void setHoraVisita(LocalTime horaVisita) { this.horaVisita = horaVisita; }
 
     public String getCpfCnpj() { return cpfCnpj; }
     public void setCpfCnpj(String cpfCnpj) { this.cpfCnpj = cpfCnpj; }

@@ -20,7 +20,8 @@ public class ClienteService {
     private ModelMapper mapper = new ModelMapper();
 
     public List<ClienteDTO> obterTodos(){
-        List<Cliente> clientes = clienteRepository.findAll();
+        Integer vendedorId = com.minhavendas.vendas.security.SecurityUtils.getVendedorIdLogado();
+        List<Cliente> clientes = clienteRepository.findByVendedorIdOrVendedorIdIsNull(vendedorId);
         return clientes.stream()
         .map(cliente -> mapper.map(cliente, ClienteDTO.class))
         .collect(Collectors.toList());
@@ -38,6 +39,7 @@ public class ClienteService {
         clientedto.setId(null);
 
         Cliente cliente = mapper.map(clientedto, Cliente.class);
+        cliente.setVendedorId(com.minhavendas.vendas.security.SecurityUtils.getVendedorIdLogado());
 
         cliente = clienteRepository.save(cliente);
 
@@ -63,6 +65,7 @@ public class ClienteService {
         clienteDto.setId(id);
 
         Cliente cliente = mapper.map(clienteDto, Cliente.class);
+        cliente.setVendedorId(clienteOptional.get().getVendedorId());
 
         clienteRepository.save(cliente);
 

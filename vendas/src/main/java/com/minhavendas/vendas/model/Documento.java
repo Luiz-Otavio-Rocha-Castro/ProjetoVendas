@@ -30,10 +30,16 @@ public class Documento {
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
+    @Column(name = "vendedor_id")
+    private Integer vendedorId;
+
     // getters e setters
 
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
+
+    public Integer getVendedorId() { return vendedorId; }
+    public void setVendedorId(Integer vendedorId) { this.vendedorId = vendedorId; }
 
     public String getNomeArquivo() { return nomeArquivo; }
     public void setNomeArquivo(String nomeArquivo) { this.nomeArquivo = nomeArquivo; }

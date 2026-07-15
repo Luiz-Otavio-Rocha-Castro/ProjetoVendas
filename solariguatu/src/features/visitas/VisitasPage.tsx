@@ -41,6 +41,7 @@ function VisitaModal({ visita, clientes, onClose, onSave }: ModalProps) {
     nomeProspecto: visita?.nomeProspecto ?? '',
     endereco: visita?.endereco ?? '',
     dataVisita: visita?.dataVisita ?? new Date().toISOString().split('T')[0],
+    horaVisita: visita?.horaVisita ?? '',
     cpfCnpj: visita?.cpfCnpj ?? '',
     anotacoes: visita?.anotacoes ?? '',
     status: visita?.status ?? 'Agendada',
@@ -59,6 +60,7 @@ function VisitaModal({ visita, clientes, onClose, onSave }: ModalProps) {
     if (!form.nomeProspecto.trim()) e.nomeProspecto = 'Nome obrigatório'
     if (!form.endereco.trim()) e.endereco = 'Endereço obrigatório'
     if (!form.dataVisita) e.dataVisita = 'Data obrigatória'
+    if (!form.horaVisita) e.horaVisita = 'Horário obrigatório'
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -185,7 +187,7 @@ function VisitaModal({ visita, clientes, onClose, onSave }: ModalProps) {
             </p>
           </div>
 
-          {/* Data + Status */}
+          {/* Data + Hora */}
           <div style={{ display: 'flex', gap: '10px' }}>
             <div style={{ flex: 1 }}>
               <label style={labelStyle}>Data da Visita *</label>
@@ -197,17 +199,28 @@ function VisitaModal({ visita, clientes, onClose, onSave }: ModalProps) {
               />
             </div>
             <div style={{ flex: 1 }}>
-              <label style={labelStyle}>Status</label>
-              <select
-                style={inputStyle}
-                value={form.status}
-                onChange={e => set('status', e.target.value)}
-              >
-                <option value="Agendada">Agendada</option>
-                <option value="Realizada">Realizada</option>
-                <option value="Cancelada">Cancelada</option>
-              </select>
+              <label style={labelStyle}>Horário *</label>
+              <input
+                type="time"
+                style={{ ...inputStyle, borderColor: errors.horaVisita ? 'var(--color-danger)' : 'var(--color-border)' }}
+                value={form.horaVisita}
+                onChange={e => set('horaVisita', e.target.value)}
+              />
             </div>
+          </div>
+
+          {/* Status */}
+          <div>
+            <label style={labelStyle}>Status</label>
+            <select
+              style={inputStyle}
+              value={form.status}
+              onChange={e => set('status', e.target.value)}
+            >
+              <option value="Agendada">Agendada</option>
+              <option value="Realizada">Realizada</option>
+              <option value="Cancelada">Cancelada</option>
+            </select>
           </div>
 
           {/* Anotações de Campo */}
@@ -315,12 +328,39 @@ function VisitaCard({ visita, columnColor, columnBg, onEdit, onDelete, onStatusC
           </p>
         </div>
 
-        {/* Data */}
+        {/* Data e Hora */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <Calendar size={11} color="var(--color-muted)" />
           <p style={{ fontSize: '0.75rem', color: 'var(--color-muted)', margin: 0 }}>
-            {formatDate(visita.dataVisita)}
+            {formatDate(visita.dataVisita)} {visita.horaVisita ? `às ${visita.horaVisita.substring(0, 5)}` : ''}
           </p>
+          
+          {/* Alerta Visual de Proximidade */}
+          {visita.status === 'Agendada' && visita.horaVisita && (() => {
+            const dataHora = new Date(`${visita.dataVisita}T${visita.horaVisita}`);
+            const agora = new Date();
+            const diffMinutos = (dataHora.getTime() - agora.getTime()) / (1000 * 60);
+            
+            // Se faltam entre 0 e 180 minutos (3 horas)
+            if (diffMinutos >= 0 && diffMinutos <= 180) {
+              return (
+                <div title="Visita se aproximando!" style={{ 
+                  display: 'flex', alignItems: 'center', gap: '4px',
+                  background: 'oklch(0.85 0.15 85 / 0.2)', color: 'oklch(0.65 0.18 80)',
+                  padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 700,
+                  marginLeft: 'auto'
+                }}>
+                  <span style={{ 
+                    display: 'inline-block', width: '6px', height: '6px', 
+                    borderRadius: '50%', background: 'oklch(0.65 0.18 80)',
+                    animation: 'pulse 2s infinite'
+                  }} />
+                  Em breve
+                </div>
+              );
+            }
+            return null;
+          })()}
         </div>
       </div>
 

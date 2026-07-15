@@ -19,6 +19,8 @@ public class Cliente {
     private String telefone;
     
     private String endereco;
+    
+    private Integer vendedorId;
     //#endregion
 
     //#region gets e setters
@@ -61,6 +63,9 @@ public class Cliente {
     public void setCpf(String cpf) {
         this.cpf = cpf;
     }
+
+    public Integer getVendedorId() { return vendedorId; }
+    public void setVendedorId(Integer vendedorId) { this.vendedorId = vendedorId; }
     //#endregion
 
     

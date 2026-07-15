@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 @Entity
 public class Vendedor {
 
-    //#region atributos
+    // #region atributos
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -25,15 +25,13 @@ public class Vendedor {
 
     private Double metaKwp;
 
+    @jakarta.persistence.Column(columnDefinition = "bytea")
+    private byte[] fotoPerfil;
 
+    // #endregion
 
-
-
-
-    //#endregion
-
-    //#region GEts e setters
-     public Integer getId() {
+    // #region GEts e setters
+    public Integer getId() {
         return id;
     }
 
@@ -89,6 +87,13 @@ public class Vendedor {
         this.metaKwp = metaKwp;
     }
 
-    
-    //#endregion
+    public byte[] getFotoPerfil() {
+        return fotoPerfil;
+    }
+
+    public void setFotoPerfil(byte[] fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
+    }
+
+    // #endregion
 }

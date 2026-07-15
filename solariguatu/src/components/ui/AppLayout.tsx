@@ -1,18 +1,21 @@
+import { useState, useEffect, useRef } from 'react'
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, FileText, LogOut,
   Zap, Bell, AlertCircle, FolderOpen, UserCircle, ChevronRight, MapPin,
 } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
+import { api } from '../../services/api'
 import ToastContainer from './Toast'
+import { notificacoesService, NotificacaoResponse } from '../../services/notificacoes/notificacoesService'
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/vendas',     icon: FileText,        label: 'Contratos' },
-  { to: '/pagamentos', icon: AlertCircle,     label: 'Pagamentos' },
-  { to: '/documentos', icon: FolderOpen,      label: 'Documentos' },
-  { to: '/visitas',    icon: MapPin,          label: 'Visitas' },
-  { to: '/perfil',     icon: UserCircle,      label: 'Perfil' },
+  { to: '/vendas', icon: FileText, label: 'Contratos' },
+  { to: '/pagamentos', icon: AlertCircle, label: 'Pagamentos' },
+  { to: '/documentos', icon: FolderOpen, label: 'Documentos' },
+  { to: '/visitas', icon: MapPin, label: 'Visitas' },
+  { to: '/perfil', icon: UserCircle, label: 'Perfil' },
 ]
 
 const PAGE_TITLES: Record<string, string> = {
@@ -20,7 +23,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/vendas': 'Contratos',
   '/pagamentos': 'Pagamentos Pendentes',
   '/documentos': 'Documentos',
-  '/visitas':    'Visitas & Prospectos',
+  '/visitas': 'Visitas & Prospectos',
   '/perfil': 'Meu Perfil',
 }
 
@@ -44,6 +47,57 @@ export default function AppLayout() {
   }
 
   const firstName = user?.name?.split(' ')[0] ?? 'Vendedor'
+
+  // Construct absolute URL for the photo to bypass React Router issues
+  const fotoUrl = user?.id ? `${api.defaults.baseURL || 'http://localhost:8080'}/api/vendas-vendedor/${user.id}/foto` : ''
+  const [imgError, setImgError] = useState(false)
+
+  useEffect(() => {
+    setImgError(false)
+  }, [fotoUrl])
+
+  // Notificações
+  const [notificacoes, setNotificacoes] = useState<NotificacaoResponse[]>([])
+  const [notificacoesAbertas, setNotificacoesAbertas] = useState(false)
+  const bellRef = useRef<HTMLDivElement>(null)
+
+  const carregarNotificacoes = async () => {
+    try {
+      const dados = await notificacoesService.listarTodas()
+      setNotificacoes(dados)
+    } catch (error) {
+      console.error('Erro ao carregar notificações', error)
+    }
+  }
+
+  useEffect(() => {
+    carregarNotificacoes()
+    const interval = setInterval(carregarNotificacoes, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    const handleClickFora = (e: MouseEvent) => {
+      if (bellRef.current && !bellRef.current.contains(e.target as Node)) {
+        setNotificacoesAbertas(false)
+      }
+    }
+    if (notificacoesAbertas) {
+      document.addEventListener('mousedown', handleClickFora)
+    }
+    return () => document.removeEventListener('mousedown', handleClickFora)
+  }, [notificacoesAbertas])
+
+  const naoLidas = notificacoes.filter(n => !n.lida).length
+
+  const handleLerNotificacao = async (id: number) => {
+    try {
+      await notificacoesService.marcarComoLida(id)
+      setNotificacoes(prev => prev.map(n => n.id === id ? { ...n, lida: true } : n))
+    } catch (error) {
+      console.error('Erro ao marcar como lida', error)
+    }
+  }
 
   return (
     <div className="app-shell">
@@ -142,31 +196,7 @@ export default function AppLayout() {
           ))}
         </nav>
 
-        {/* ── Status pill ── */}
-        <div style={{ padding: '12px 10px' }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: '8px',
-            padding: '10px 12px', borderRadius: '9px',
-            background: 'rgba(22,163,74,0.12)',
-            border: '1px solid rgba(22,163,74,0.20)',
-          }}>
-            <span style={{
-              width: '7px', height: '7px', borderRadius: '50%',
-              background: '#4ADE80', flexShrink: 0,
-              boxShadow: '0 0 0 3px rgba(74,222,128,0.20)',
-              animation: 'pulse-dot 2s ease-in-out infinite',
-            }} />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#4ADE80', margin: 0 }}>
-                Sistema Online
-              </p>
-              <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.40)', margin: 0 }}>
-                Dados em tempo real
-              </p>
-            </div>
-            <Zap size={12} color="rgba(74,222,128,0.70)" />
-          </div>
-        </div>
+
 
         {/* ── User block ── */}
         <div style={{
@@ -180,8 +210,13 @@ export default function AppLayout() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: '0.75rem', fontWeight: 700, color: '#fff',
             fontFamily: 'var(--font-display)',
+            overflow: 'hidden'
           }}>
-            {user?.avatar}
+            {fotoUrl && !imgError ? (
+              <img src={fotoUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={() => setImgError(true)} />
+            ) : (
+              user?.avatar
+            )}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#FFFFFF', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -263,34 +298,90 @@ export default function AppLayout() {
           {/* Right actions */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {/* Notification bell */}
-            <button
-              className="touch-target"
-              style={{
-                position: 'relative', padding: '8px', borderRadius: '9px',
-                border: '1px solid var(--color-border)',
-                background: 'var(--color-surface)',
-                cursor: 'pointer', color: 'var(--color-muted)',
-                transition: 'all 0.15s ease',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
-              title="Notificações"
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--color-primary-border)'
-                  ; (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-primary)'
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--color-border)'
-                  ; (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-muted)'
-              }}
-            >
-              <Bell size={16} />
-              <span style={{
-                position: 'absolute', top: '7px', right: '7px',
-                width: '6px', height: '6px', borderRadius: '50%',
-                background: '#E8901A',
-                border: '1.5px solid var(--color-surface)',
-              }} />
-            </button>
+            <div ref={bellRef} style={{ position: 'relative' }}>
+              <button
+                className="touch-target"
+                onClick={() => setNotificacoesAbertas(!notificacoesAbertas)}
+                style={{
+                  position: 'relative', padding: '8px', borderRadius: '9px',
+                  border: '1px solid var(--color-border)',
+                  background: 'var(--color-surface)',
+                  cursor: 'pointer', color: 'var(--color-muted)',
+                  transition: 'all 0.15s ease',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+                title="Notificações"
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--color-primary-border)'
+                    ; (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-primary)'
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--color-border)'
+                    ; (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-muted)'
+                }}
+              >
+                <Bell size={16} />
+                {naoLidas > 0 && (
+                  <span style={{
+                    position: 'absolute', top: '-4px', right: '-4px',
+                    minWidth: '16px', height: '16px', padding: '0 4px', borderRadius: '8px',
+                    background: '#E8901A', color: '#fff', fontSize: '0.65rem',
+                    fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    border: '1.5px solid var(--color-surface)',
+                  }}>
+                    {naoLidas}
+                  </span>
+                )}
+              </button>
+
+              {/* Popover de Notificações */}
+              {notificacoesAbertas && (
+                <div style={{
+                  position: 'absolute', top: 'calc(100% + 10px)', right: 0,
+                  width: '320px', maxHeight: '400px', overflowY: 'auto',
+                  background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+                  borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                  zIndex: 100, display: 'flex', flexDirection: 'column',
+                }}>
+                  <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600, color: 'var(--color-foreground)' }}>Notificações</h3>
+                    {naoLidas > 0 && <span style={{ fontSize: '0.75rem', color: '#E8901A', fontWeight: 600 }}>{naoLidas} não lidas</span>}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    {notificacoes.length === 0 ? (
+                      <div style={{ padding: '30px 16px', textAlign: 'center', color: 'var(--color-muted)', fontSize: '0.85rem' }}>
+                        Nenhuma notificação por enquanto.
+                      </div>
+                    ) : (
+                      notificacoes.map(n => (
+                        <div
+                          key={n.id}
+                          onClick={() => {
+                            if (!n.lida) handleLerNotificacao(n.id)
+                          }}
+                          style={{
+                            padding: '12px 16px', borderBottom: '1px solid var(--color-border)',
+                            background: n.lida ? 'transparent' : 'rgba(232,144,26,0.05)',
+                            cursor: n.lida ? 'default' : 'pointer', transition: 'background 0.2s',
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <strong style={{ fontSize: '0.85rem', color: 'var(--color-foreground)', fontWeight: n.lida ? 500 : 700 }}>{n.titulo}</strong>
+                            {!n.lida && <span style={{ width: '8px', height: '8px', background: '#E8901A', borderRadius: '50%', flexShrink: 0, marginTop: '4px' }} />}
+                          </div>
+                          <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--color-muted)', lineHeight: 1.4 }}>
+                            {n.mensagem}
+                          </p>
+                          <small style={{ display: 'block', marginTop: '6px', fontSize: '0.7rem', color: 'var(--color-muted)', opacity: 0.7 }}>
+                            {new Date(n.dataCriacao).toLocaleString('pt-BR')}
+                          </small>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Avatar */}
             <button
@@ -306,6 +397,7 @@ export default function AppLayout() {
                 border: 'none', cursor: 'pointer',
                 transition: 'transform 0.15s ease, box-shadow 0.15s ease',
                 boxShadow: '0 2px 8px rgba(232,144,26,0.30)',
+                overflow: 'hidden'
               }}
               onMouseEnter={e => {
                 (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.06)'
@@ -316,7 +408,11 @@ export default function AppLayout() {
                   ; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 8px rgba(232,144,26,0.30)'
               }}
             >
-              {user?.avatar}
+              {fotoUrl && !imgError ? (
+                <img src={fotoUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={() => setImgError(true)} />
+              ) : (
+                user?.avatar
+              )}
             </button>
           </div>
         </header>

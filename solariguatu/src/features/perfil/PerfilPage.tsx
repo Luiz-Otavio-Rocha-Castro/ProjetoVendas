@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react'
+import { useState, useEffect, useRef, type FormEvent } from 'react'
 import {
   User, Mail, MapPin, Target, Zap,
   Save, Lock, Eye, EyeOff, TrendingUp,
@@ -44,10 +44,11 @@ function Section({ title, icon, children }: { title: string; icon: React.ReactNo
 }
 
 export default function PerfilPage() {
-  const { perfil, saving, loading, updatePerfil } = usePerfil()
+  const { perfil, saving, loading, updatePerfil, uploadFoto } = usePerfil()
   const { logout } = useAuth()
   const navigate = useNavigate()
   const { toast } = useToast()
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Form state
   const [nome, setNome] = useState(perfil.nome)
@@ -60,6 +61,9 @@ export default function PerfilPage() {
   const [novaSenha, setNovaSenha] = useState('')
   const [showSenha, setShowSenha] = useState(false)
 
+  // Image error state
+  const [imgError, setImgError] = useState(false)
+
   // Sync form when perfil loads
   useEffect(() => {
     setNome(perfil.nome)
@@ -67,6 +71,11 @@ export default function PerfilPage() {
     setMetaReais(String(perfil.metaReais))
     setMetaKwp(String(perfil.metaKwp))
   }, [perfil.nome, perfil.regiao, perfil.metaReais, perfil.metaKwp])
+
+  // Reset imgError when fotoUrl changes
+  useEffect(() => {
+    setImgError(false)
+  }, [perfil.fotoUrl])
 
   const handleSave = async (e: FormEvent) => {
     e.preventDefault()
@@ -90,12 +99,28 @@ export default function PerfilPage() {
     if (novaSenha.length < 6) { toast('error', 'Senha fraca', 'A nova senha deve ter pelo menos 6 caracteres.'); return }
     
     try {
-      await updatePerfil({ senha: novaSenha })
+      await updatePerfil({ senha: novaSenha, senhaAntiga: senhaAtual })
       setSenhaAtual('')
       setNovaSenha('')
       toast('success', 'Senha alterada!', 'Sua senha foi atualizada com sucesso.')
-    } catch {
-      toast('error', 'Erro ao atualizar', 'Não foi possível alterar a senha.')
+    } catch (error: any) {
+      toast('error', 'Erro ao atualizar', error.response?.data?.message || 'A senha atual informada está incorreta ou houve um erro.')
+    }
+  }
+
+  const handleFotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0]
+      if (file.size > 5 * 1024 * 1024) {
+        toast('error', 'Arquivo muito grande', 'A foto deve ter no máximo 5MB.')
+        return
+      }
+      try {
+        await uploadFoto(file)
+        toast('success', 'Foto atualizada!', 'Sua foto de perfil foi alterada com sucesso.')
+      } catch {
+        toast('error', 'Erro no upload', 'Não foi possível salvar a foto.')
+      }
     }
   }
 
@@ -135,16 +160,23 @@ export default function PerfilPage() {
           {/* Avatar card */}
           <div className="glass rounded-2xl p-6 flex flex-col items-center gap-4 text-center">
             <div className="relative">
+              <input type="file" ref={fileInputRef} onChange={handleFotoChange} accept="image/*" className="hidden" />
               <div
-                className="w-24 h-24 rounded-full flex items-center justify-center text-2xl font-extrabold glow-amber animate-pulse-glow"
+                className="w-24 h-24 rounded-full flex items-center justify-center text-2xl font-extrabold glow-amber hover:opacity-90 cursor-pointer overflow-hidden"
                 style={{ background: 'var(--color-primary)', color: '#0a0a0a', fontFamily: 'var(--font-display)' }}
+                onClick={() => fileInputRef.current?.click()}
               >
-                {initials}
+                {perfil.fotoUrl && !imgError ? (
+                  <img src={perfil.fotoUrl} alt="Avatar" className="w-full h-full object-cover" onError={() => setImgError(true)} />
+                ) : (
+                  initials
+                )}
               </div>
               <button
-                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center transition-colors hover:opacity-90"
+                className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center transition-colors hover:opacity-90 cursor-pointer"
                 style={{ background: 'var(--color-surface-2)', border: '2px solid var(--color-background)', color: 'var(--color-muted)' }}
-                title="Editar avatar (simulado)"
+                onClick={() => fileInputRef.current?.click()}
+                title="Editar avatar"
               >
                 <Edit3 size={12} />
               </button>
@@ -167,7 +199,7 @@ export default function PerfilPage() {
           {/* Meta card */}
           <div className="glass rounded-2xl p-5 flex flex-col gap-4">
             <p className="text-sm font-semibold" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-foreground)' }}>
-              Metas — Dezembro 2025
+              Metas — {['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'][new Date().getMonth()]} {new Date().getFullYear()}
             </p>
             {/* Faturamento */}
             <div className="flex flex-col gap-2">
@@ -311,7 +343,7 @@ export default function PerfilPage() {
                 style={{ background: 'var(--color-primary-subtle)', color: 'var(--color-primary)', border: '1px solid var(--color-primary-glow)' }}
               >
                 <CheckCircle2 size={13} />
-                Sua senha é armazenada de forma segura e criptografada. (Demo – nenhuma senha real é salva)
+                Sua senha é armazenada de forma segura e criptografada.
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

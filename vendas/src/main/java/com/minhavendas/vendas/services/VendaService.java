@@ -26,7 +26,8 @@ public class VendaService {
     private ClienteRepository clienteRepository;
 
     public List<VendaDTO> obterTodos(){
-        List<Venda> Vendas = vendaRepository.findAll();
+        Integer vendedorId = com.minhavendas.vendas.security.SecurityUtils.getVendedorIdLogado();
+        List<Venda> Vendas = vendaRepository.findByVendedorIdOrVendedorIdIsNull(vendedorId);
         return Vendas.stream()
         .map(venda -> {
            VendaDTO vendaDTO = mapper.map(venda, VendaDTO.class);
@@ -63,6 +64,7 @@ public class VendaService {
         vendaDto.setCliente(cliente.get());
 
         Venda venda = mapper.map(vendaDto, Venda.class);
+        venda.setVendedorId(com.minhavendas.vendas.security.SecurityUtils.getVendedorIdLogado());
         venda = vendaRepository.save(venda);
 
         vendaDto.setId(venda.getId());
@@ -105,6 +107,7 @@ public class VendaService {
         vendaDto.setCliente(cliente.get());
 
         Venda VENDA = mapper.map(vendaDto, Venda.class);
+        VENDA.setVendedorId(venda.get().getVendedorId());
         vendaRepository.save(VENDA);
         return vendaDto;
 

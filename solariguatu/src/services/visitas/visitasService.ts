@@ -5,6 +5,7 @@ export interface VisitaResponse {
   nomeProspecto: string
   endereco: string
   dataVisita: string
+  horaVisita?: string
   cpfCnpj?: string | null
   anotacoes: string | null
   status: 'Agendada' | 'Realizada' | 'Cancelada'
@@ -14,6 +15,7 @@ export interface VisitaRequest {
   nomeProspecto: string
   endereco: string
   dataVisita: string
+  horaVisita?: string
   cpfCnpj?: string
   anotacoes?: string
   status: string

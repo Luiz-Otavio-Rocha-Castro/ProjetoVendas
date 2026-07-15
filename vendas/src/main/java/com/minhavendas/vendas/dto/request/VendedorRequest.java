@@ -9,6 +9,8 @@ public class VendedorRequest {
 
     private String senha;
 
+    private String senhaAntiga;
+
     private String regiaoAtuacao;
 
     private Double metaMensal;
@@ -43,6 +45,13 @@ public class VendedorRequest {
         this.senha = senha;
     }
 
+    public String getSenhaAntiga() {
+        return senhaAntiga;
+    }
+
+    public void setSenhaAntiga(String senhaAntiga) {
+        this.senhaAntiga = senhaAntiga;
+    }
 
     public String getRegiaoAtuacao() {
         return regiaoAtuacao;

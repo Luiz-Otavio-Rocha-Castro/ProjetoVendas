@@ -10,7 +10,7 @@ import { CIDADES, STATUS_OPTIONS, mockContratos } from './mockVendas'
 type Dados = Omit<Contrato, 'id' | 'dataCriacao'>
 
 const empty: Dados = {
-  cliente: '', cpfCnpj: '', telefone: '', cidade: CIDADES[0],
+  cliente: '', cpfCnpj: '', telefone: '', cidade: '',
   vendedor: 'Lucas Araújo', produto: '', kwp: 0, valorTotal: 0,
   comissao: 0, saldoDevedor: 0,
   status: 'Pendente', paineis: 0, financiamento: 'Financiado',
@@ -60,6 +60,21 @@ export default function NovoContratoModal({ open, onClose, onSave, initialData, 
   const set = <K extends keyof Dados>(k: K, v: Dados[K]) =>
     setForm((f) => ({ ...f, [k]: v }))
 
+  const formatCPF = (val: string) => {
+    return val.replace(/\D/g, '')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+      .replace(/(-\d{2})\d+?$/, '$1')
+  }
+
+  const formatPhone = (val: string) => {
+    return val.replace(/\D/g, '')
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{5})(\d)/, '$1-$2')
+      .replace(/(-\d{4})\d+?$/, '$1')
+  }
+
   // Ao selecionar cliente existente, preenche campos de cliente automaticamente
   const handleClienteSelect = (cpfCnpj: string) => {
     setClienteSelecionado(cpfCnpj)
@@ -78,14 +93,20 @@ export default function NovoContratoModal({ open, onClose, onSave, initialData, 
 
   const handleLimparCliente = () => {
     setClienteSelecionado('')
-    setForm((f) => ({ ...f, cliente: '', cpfCnpj: '', telefone: '', cidade: CIDADES[0] }))
+    setForm((f) => ({ ...f, cliente: '', cpfCnpj: '', telefone: '', cidade: '' }))
   }
 
   const validate = (): boolean => {
     const e: typeof errors = {}
     if (!form.cliente.trim())  e.cliente    = 'Campo obrigatório'
-    if (!form.cpfCnpj.trim())  e.cpfCnpj    = 'Campo obrigatório'
-    if (!form.telefone.trim()) e.telefone   = 'Campo obrigatório'
+    
+    const cpfDigitCount = form.cpfCnpj.replace(/\D/g, '').length
+    if (cpfDigitCount !== 11) e.cpfCnpj = 'O CPF deve ter exatamente 11 números'
+    
+    const phoneDigitCount = form.telefone.replace(/\D/g, '').length
+    if (phoneDigitCount !== 11) e.telefone = 'O telefone deve ter exatamente 11 números (com DDD)'
+    
+    if (!form.cidade.trim())   e.cidade     = 'Campo obrigatório'
     if (!form.produto.trim())  e.produto    = 'Campo obrigatório'
     if (form.valorTotal <= 0)  e.valorTotal  = 'Valor deve ser maior que 0'
     if (Number(comissaoPct) < 0) e.comissao   = 'Comissão não pode ser negativa'
@@ -198,10 +219,10 @@ export default function NovoContratoModal({ open, onClose, onSave, initialData, 
               />
             </div>
             <Input
-              label="CPF / CNPJ *"
+              label="CPF *"
               placeholder="000.000.000-00"
               value={form.cpfCnpj}
-              onChange={(e) => set('cpfCnpj', e.target.value)}
+              onChange={(e) => set('cpfCnpj', formatCPF(e.target.value))}
               error={errors.cpfCnpj}
               disabled={camposClienteBloqueados}
               style={camposClienteBloqueados ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
@@ -210,17 +231,19 @@ export default function NovoContratoModal({ open, onClose, onSave, initialData, 
               label="Telefone *"
               placeholder="(00) 90000-0000"
               value={form.telefone}
-              onChange={(e) => set('telefone', e.target.value)}
+              onChange={(e) => set('telefone', formatPhone(e.target.value))}
               error={errors.telefone}
               disabled={camposClienteBloqueados}
               style={camposClienteBloqueados ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
             />
-            <Select
-              label="Cidade"
+            <Input
+              label="Cidade *"
+              placeholder="Ex: Iguatu"
               value={form.cidade}
               onChange={(e) => set('cidade', e.target.value)}
-              options={CIDADES.map((c) => ({ value: c, label: c }))}
+              error={errors.cidade}
               disabled={camposClienteBloqueados}
+              style={camposClienteBloqueados ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
             />
           </div>
         </section>

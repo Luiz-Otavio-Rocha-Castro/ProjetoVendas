@@ -22,7 +22,8 @@ public class VisitaService {
     private ModelMapper mapper = new ModelMapper();
 
     public List<VisitaResponse> listarTodas() {
-        return visitaRepository.findAll()
+        Integer vendedorId = com.minhavendas.vendas.security.SecurityUtils.getVendedorIdLogado();
+        return visitaRepository.findByVendedorIdOrVendedorIdIsNull(vendedorId)
                 .stream()
                 .map(v -> mapper.map(v, VisitaResponse.class))
                 .collect(Collectors.toList());
@@ -34,6 +35,7 @@ public class VisitaService {
         }
         Visita visita = mapper.map(request, Visita.class);
         visita.setId(null);
+        visita.setVendedorId(com.minhavendas.vendas.security.SecurityUtils.getVendedorIdLogado());
         visita = visitaRepository.save(visita);
         return mapper.map(visita, VisitaResponse.class);
     }
@@ -47,8 +49,11 @@ public class VisitaService {
         visita.setNomeProspecto(request.getNomeProspecto());
         visita.setEndereco(request.getEndereco());
         visita.setDataVisita(request.getDataVisita());
+        visita.setHoraVisita(request.getHoraVisita());
+        visita.setCpfCnpj(request.getCpfCnpj());
         visita.setAnotacoes(request.getAnotacoes());
         visita.setStatus(request.getStatus());
+        visita.setAlertaEnviado(false); // Reseta o alerta caso ele mude o horário
         visita = visitaRepository.save(visita);
         return mapper.map(visita, VisitaResponse.class);
     }

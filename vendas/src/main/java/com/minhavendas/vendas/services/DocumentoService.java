@@ -42,6 +42,7 @@ public class DocumentoService {
         doc.setDataEnvio(LocalDate.now());
         doc.setConteudo(arquivo.getBytes());
         doc.setCliente(clienteOpt.get());
+        doc.setVendedorId(com.minhavendas.vendas.security.SecurityUtils.getVendedorIdLogado());
 
         doc = documentoRepository.save(doc);
 
@@ -49,7 +50,8 @@ public class DocumentoService {
     }
 
     public List<DocumentoResponse> listarTodos() {
-        return documentoRepository.findAll()
+        Integer vendedorId = com.minhavendas.vendas.security.SecurityUtils.getVendedorIdLogado();
+        return documentoRepository.findByVendedorIdOrVendedorIdIsNull(vendedorId)
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
@@ -58,6 +60,12 @@ public class DocumentoService {
     public byte[] baixarConteudo(Integer id) {
         Documento doc = documentoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Documento não encontrado: " + id));
+        
+        Integer vendedorId = com.minhavendas.vendas.security.SecurityUtils.getVendedorIdLogado();
+        if (doc.getVendedorId() != null && !doc.getVendedorId().equals(vendedorId)) {
+            throw new RuntimeException("Acesso negado a este documento.");
+        }
+        
         return doc.getConteudo();
     }
 
@@ -68,9 +76,14 @@ public class DocumentoService {
     }
 
     public void deletar(Integer id) {
-        if (!documentoRepository.existsById(id)) {
-            throw new RuntimeException("Documento não encontrado: " + id);
+        Documento doc = documentoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Documento não encontrado: " + id));
+        
+        Integer vendedorId = com.minhavendas.vendas.security.SecurityUtils.getVendedorIdLogado();
+        if (doc.getVendedorId() != null && !doc.getVendedorId().equals(vendedorId)) {
+            throw new RuntimeException("Acesso negado para deletar este documento.");
         }
+        
         documentoRepository.deleteById(id);
     }
 
