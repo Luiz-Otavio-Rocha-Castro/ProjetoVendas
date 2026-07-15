@@ -13,9 +13,9 @@ import type { ClienteSimples } from '../../services/documentos/documentosService
 type Status = 'Agendada' | 'Realizada' | 'Cancelada'
 
 const STATUS_CONFIG: Record<Status, { label: string; icon: React.ReactNode; color: string; bg: string; border: string }> = {
-  Agendada:  { label: 'Agendadas',  icon: <Clock size={14} />,        color: 'oklch(0.78 0.15 80)',  bg: 'oklch(0.78 0.15 80 / 0.10)',  border: 'oklch(0.78 0.15 80 / 0.25)'  },
+  Agendada: { label: 'Agendadas', icon: <Clock size={14} />, color: 'oklch(0.78 0.15 80)', bg: 'oklch(0.78 0.15 80 / 0.10)', border: 'oklch(0.78 0.15 80 / 0.25)' },
   Realizada: { label: 'Realizadas', icon: <CheckCircle2 size={14} />, color: 'oklch(0.72 0.17 145)', bg: 'oklch(0.72 0.17 145 / 0.10)', border: 'oklch(0.72 0.17 145 / 0.25)' },
-  Cancelada: { label: 'Canceladas', icon: <XCircle size={14} />,      color: 'oklch(0.65 0.22 25)',  bg: 'oklch(0.65 0.22 25 / 0.10)',  border: 'oklch(0.65 0.22 25 / 0.25)'  },
+  Cancelada: { label: 'Canceladas', icon: <XCircle size={14} />, color: 'oklch(0.65 0.22 25)', bg: 'oklch(0.65 0.22 25 / 0.10)', border: 'oklch(0.65 0.22 25 / 0.25)' },
 }
 
 function formatDate(iso: string): string {
@@ -417,11 +417,11 @@ function VisitaCard({ visita, columnColor, columnBg, onEdit, onDelete, onStatusC
           }}
           onMouseEnter={e => {
             (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--color-foreground)'
-            ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--color-foreground)'
+              ; (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-foreground)'
           }}
           onMouseLeave={e => {
             (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--color-border)'
-            ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--color-muted)'
+              ; (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-muted)'
           }}
         >
           Editar
@@ -439,11 +439,11 @@ function VisitaCard({ visita, columnColor, columnBg, onEdit, onDelete, onStatusC
           }}
           onMouseEnter={e => {
             (e.currentTarget as HTMLButtonElement).style.background = 'var(--color-danger-bg)'
-            ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--color-danger)'
+              ; (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-danger)'
           }}
           onMouseLeave={e => {
             (e.currentTarget as HTMLButtonElement).style.background = 'transparent'
-            ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--color-muted)'
+              ; (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-muted)'
           }}
         >
           <Trash2 size={13} />
@@ -552,7 +552,15 @@ export default function VisitasPage() {
   const handleStatusChange = async (id: number, status: Status) => {
     const v = [...agendadas, ...realizadas, ...canceladas].find(x => x.id === id)
     if (!v) return
-    await atualizar(id, { ...v, anotacoes: v.anotacoes ?? '', status })
+    const req: VisitaRequest = {
+      nomeProspecto: v.nomeProspecto,
+      endereco: v.endereco,
+      dataVisita: v.dataVisita,
+      cpfCnpj: v.cpfCnpj ?? undefined,
+      anotacoes: v.anotacoes ?? undefined,
+      status,
+    }
+    await atualizar(id, req)
   }
 
   return (
