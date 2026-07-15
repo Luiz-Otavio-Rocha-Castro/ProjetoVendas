@@ -11,7 +11,6 @@ export interface PerfilVendedor {
   metaKwp: number
   faturamentoAtual: number
   kwpAtual: number
-  kwpAtual: number
   contratosAtual: number
   fotoUrl: string
 }
@@ -24,7 +23,6 @@ const PERFIL_INICIAL: PerfilVendedor = {
   metaReais: 0,
   metaKwp: 0,
   faturamentoAtual: 0,
-  kwpAtual: 0,
   kwpAtual: 0,
   contratosAtual: 0,
   fotoUrl: ''
