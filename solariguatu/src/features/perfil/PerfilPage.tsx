@@ -228,9 +228,9 @@ export default function PerfilPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-xs font-bold" style={{ color: 'var(--color-foreground)' }}>
-                    {perfil.kwpAtual} kWp
+                    {Number(perfil.kwpAtual).toLocaleString('pt-BR', { maximumFractionDigits: 2 })} kWp
                   </p>
-                  <p className="text-xs" style={{ color: 'var(--color-muted)' }}>/ {perfil.metaKwp} kWp</p>
+                  <p className="text-xs" style={{ color: 'var(--color-muted)' }}>/ {Number(perfil.metaKwp).toLocaleString('pt-BR', { maximumFractionDigits: 2 })} kWp</p>
                 </div>
               </div>
               <ProgressBar value={perfil.kwpAtual} max={perfil.metaKwp} color="var(--color-success)" />
