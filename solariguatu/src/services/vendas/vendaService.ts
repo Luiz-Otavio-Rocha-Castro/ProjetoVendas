@@ -90,7 +90,7 @@ export async function obterVendas(): Promise<Contrato[]> {
       telefone: contrato.cliente.telefone || '(88) 99999-9999',
       cidade: contrato.cliente.endereco ||'Iguatu',
       produto: contrato.venda.produto,
-      kwp: 5.5, // Exemplo de valor padrão para painéis
+      kwp: (contrato.venda.quantidadePainel || 0) * 0.55,
       valorTotal: contrato.venda.valorTotal,
       comissao: contrato.venda.valorComissao || ((contrato.venda.percentualComissao || 0) * (contrato.venda.valorTotal || 0) / 100) || 0,
       saldoDevedor: contrato.venda.saldoDevedor || 0,
