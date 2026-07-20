@@ -408,18 +408,18 @@ function VisitaCard({ visita, columnColor, columnBg, onEdit, onDelete, onStatusC
           onClick={() => abrirGoogleMaps(visita.endereco)}
           title="Abrir no Google Maps"
           style={{
-            flex: 1, minWidth: '70px',
+            flex: '1 1 calc(50% - 4px)', minWidth: '80px', minHeight: '44px',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px',
-            padding: '7px 10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+            padding: '8px 10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
             background: columnBg,
             color: columnColor,
-            fontWeight: 700, fontSize: '0.72rem',
+            fontWeight: 700, fontSize: '0.78rem',
             transition: 'all 0.15s ease',
           }}
           onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1.15)' }}
           onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1)' }}
         >
-          <MapPin size={11} />
+          <MapPin size={13} />
           Maps
         </button>
 
@@ -429,65 +429,68 @@ function VisitaCard({ visita, columnColor, columnBg, onEdit, onDelete, onStatusC
             onClick={onCloseDeal}
             title="Fechar Venda (Gerar Contrato)"
             style={{
-              flex: 1, minWidth: '100px',
+              flex: '1 1 calc(50% - 4px)', minWidth: '80px', minHeight: '44px',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px',
-              padding: '7px 10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+              padding: '8px 10px', borderRadius: '8px', border: 'none', cursor: 'pointer',
               background: columnColor,
               color: '#fff',
-              fontWeight: 700, fontSize: '0.72rem',
+              fontWeight: 700, fontSize: '0.78rem',
               transition: 'all 0.15s ease',
-              boxShadow: `0 2px 8px ${columnColor}40`, // 40 is hex for 25% opacity
+              boxShadow: `0 2px 8px ${columnColor}40`,
             }}
             onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1.1)' }}
             onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1)' }}
           >
-            <ShoppingBag size={12} />
+            <ShoppingBag size={13} />
             Fechar Venda
           </button>
         )}
 
-        {/* Editar */}
-        <button
-          onClick={onEdit}
-          title="Editar visita"
-          style={{
-            padding: '7px 10px', borderRadius: '8px', border: '1px solid var(--color-border)',
-            background: 'transparent', color: 'var(--color-muted)', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 600,
-            transition: 'all 0.15s ease',
-          }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--color-foreground)'
-              ; (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-foreground)'
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--color-border)'
-              ; (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-muted)'
-          }}
-        >
-          Editar
-        </button>
+        {/* Editar + Remover na mesma linha */}
+        <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
+          <button
+            onClick={onEdit}
+            title="Editar visita"
+            style={{
+              flex: 1, minHeight: '40px',
+              padding: '8px 10px', borderRadius: '8px', border: '1px solid var(--color-border)',
+              background: 'transparent', color: 'var(--color-muted)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600,
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--color-foreground)'
+                ; (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-foreground)'
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--color-border)'
+                ; (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-muted)'
+            }}
+          >
+            Editar
+          </button>
 
-        {/* Remover */}
-        <button
-          onClick={onDelete}
-          title="Remover visita"
-          style={{
-            padding: '7px 8px', borderRadius: '8px', border: 'none',
-            background: 'transparent', color: 'var(--color-muted)', cursor: 'pointer',
-            display: 'flex', alignItems: 'center',
-            transition: 'all 0.15s ease',
-          }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLButtonElement).style.background = 'var(--color-danger-bg)'
-              ; (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-danger)'
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLButtonElement).style.background = 'transparent'
-              ; (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-muted)'
-          }}
-        >
-          <Trash2 size={13} />
-        </button>
+          <button
+            onClick={onDelete}
+            title="Remover visita"
+            style={{
+              minHeight: '40px', minWidth: '44px',
+              padding: '8px', borderRadius: '8px', border: 'none',
+              background: 'transparent', color: 'var(--color-muted)', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = 'var(--color-danger-bg)'
+                ; (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-danger)'
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = 'transparent'
+                ; (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-muted)'
+            }}
+          >
+            <Trash2 size={15} />
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -621,8 +624,10 @@ export default function VisitasPage() {
           </p>
         </div>
 
+        {/* Botão desktop — ocultado no mobile, substituiído pelo FAB */}
         <button
           onClick={() => { setEditVisita(undefined); setModalOpen(true) }}
+          className="visitas-add-btn-desktop"
           style={{
             display: 'flex', alignItems: 'center', gap: '7px',
             padding: '10px 18px', borderRadius: '10px', border: 'none',
@@ -639,6 +644,33 @@ export default function VisitasPage() {
         </button>
       </div>
 
+      {/* FAB — visível apenas no mobile */}
+      <button
+        onClick={() => { setEditVisita(undefined); setModalOpen(true) }}
+        title="Nova Visita"
+        style={{
+          position: 'fixed', bottom: '88px', right: '16px', zIndex: 50,
+          width: '56px', height: '56px', borderRadius: '50%', border: 'none',
+          background: 'var(--color-primary)', color: '#fff',
+          display: 'none', /* controlado via media query no CSS */
+          alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 4px 20px rgba(232,144,26,0.50)',
+          cursor: 'pointer',
+          transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+        } as React.CSSProperties}
+        className="visitas-fab"
+        onMouseEnter={e => {
+          (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.08)'
+          ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 6px 24px rgba(232,144,26,0.65)'
+        }}
+        onMouseLeave={e => {
+          (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'
+          ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 20px rgba(232,144,26,0.50)'
+        }}
+      >
+        <Plus size={22} />
+      </button>
+
       {/* ── Erro ── */}
       {error && (
         <div style={{
@@ -653,8 +685,30 @@ export default function VisitasPage() {
 
       {/* ── Kanban ── */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '60px', color: 'var(--color-muted)' }}>
-          Carregando visitas...
+        /* Skeleton Loader */
+        <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', overflowX: 'auto', paddingBottom: '8px' }}>
+          {[0, 1, 2].map(col => (
+            <div key={col} style={{ flex: 1, minWidth: '260px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {/* Cabeçalho skeleton */}
+              <div className="skeleton" style={{ height: '44px', borderRadius: '10px' }} />
+              {/* Cards skeleton */}
+              {[0, 1].map(card => (
+                <div key={card} style={{
+                  background: 'var(--color-surface)', borderRadius: '12px',
+                  border: '1px solid var(--color-border)', overflow: 'hidden', padding: '14px',
+                  display: 'flex', flexDirection: 'column', gap: '10px'
+                }}>
+                  <div className="skeleton" style={{ height: '18px', width: '70%', borderRadius: '6px' }} />
+                  <div className="skeleton" style={{ height: '14px', width: '90%', borderRadius: '6px' }} />
+                  <div className="skeleton" style={{ height: '12px', width: '50%', borderRadius: '6px' }} />
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                    <div className="skeleton" style={{ height: '36px', flex: 1, borderRadius: '8px' }} />
+                    <div className="skeleton" style={{ height: '36px', flex: 1, borderRadius: '8px' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
       ) : (
         <div style={{
@@ -755,6 +809,14 @@ export default function VisitasPage() {
           </div>
         </div>
       )}
+
+      {/* Estilos mobile-only para FAB e botão desktop */}
+      <style>{`
+        @media (max-width: 768px) {
+          .visitas-fab { display: flex !important; }
+          .visitas-add-btn-desktop { display: none !important; }
+        }
+      `}</style>
     </div>
   )
 }

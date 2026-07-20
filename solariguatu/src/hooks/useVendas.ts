@@ -5,16 +5,18 @@ import { obterVendas, cadastrarVenda, atualizarVenda, deletarVenda } from '../se
 
 export function useVendas() {
   const [contratos, setContratos] = useState<Contrato[]>([])
+  const [isLoading, setIsLoading] = useState(true)
     useEffect(() => {
     // Busca os dados da sua API do Spring Boot
     obterVendas()
       .then((dadosReais) => {
-        setContratos(dadosReais) // Coloca os dados reais no estado
+        setContratos(dadosReais)
       })
       .catch((erro) => {
         console.error("Erro ao carregar contratos do backend:", erro)
       })
-  }, []) // Executa uma única vez ao abrir
+      .finally(() => setIsLoading(false))
+  }, [])
 
   const [busca, setBusca] = useState('')
   const [mesReferencia, setMesReferencia] = useState<Date>(new Date())
@@ -102,6 +104,7 @@ export function useVendas() {
 
   return {
     contratos,
+    isLoading,
     itensPagina,
     filtrados,
     busca,

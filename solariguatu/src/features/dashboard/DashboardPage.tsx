@@ -84,8 +84,9 @@ export default function DashboardPage() {
   const { user } = useAuth()
   const firstName = user?.name?.split(' ')[0] ?? 'Vendedor'
 
-  const { contratos } = useVendas()
-  const { perfil } = usePerfil()
+  const { contratos, isLoading: loadingContratos } = useVendas()
+  const { perfil, loading: loadingPerfil } = usePerfil()
+  const isLoading = loadingContratos || loadingPerfil
 
   // Datas Dinâmicas
   const [selectedDate, setSelectedDate] = useState(new Date())
@@ -475,41 +476,59 @@ export default function DashboardPage() {
       </div>
 
       {/* ── KPI Cards: 4 col desktop / 2 col mobile ── */}
-      <div className="kpi-grid stagger">
-        <MetricCard
-          label="Vendas no mês"
-          value={String(metricas.vendasMes)}
-          sub="contratos fechados"
-          icon={<TrendingUp size={15} />}
-          trend={{ value: pct(metricas.vendasMes, metricas.vendasMesAnterior), positive: metricas.vendasMes >= metricas.vendasMesAnterior }}
-          highlight
-          delay={0}
-        />
-        <MetricCard
-          label="kWp Instalados"
-          value={`${metricas.kwpInstalados.toFixed(1)} kWp`}
-          sub="potência acumulada"
-          icon={<Zap size={15} />}
-          trend={{ value: pct(metricas.kwpInstalados, metricas.kwpAnterior), positive: metricas.kwpInstalados >= metricas.kwpAnterior }}
-          delay={70}
-        />
-        <MetricCard
-          label="Faturamento"
-          value={fmt(metricas.faturamento)}
-          sub="receita bruta estimada"
-          icon={<DollarSign size={15} />}
-          trend={{ value: pct(metricas.faturamento, metricas.faturamentoAnterior), positive: metricas.faturamento >= metricas.faturamentoAnterior }}
-          delay={140}
-        />
-        <MetricCard
-          label="Ticket Médio"
-          value={`R$ ${metricas.ticketMedio.toLocaleString('pt-BR')}`}
-          sub="por contrato"
-          icon={<Target size={15} />}
-          trend={{ value: pct(metricas.ticketMedio, metricas.ticketAnterior), positive: metricas.ticketMedio >= metricas.ticketAnterior }}
-          delay={210}
-        />
-      </div>
+      {isLoading ? (
+        <div className="kpi-grid">
+          {[0, 1, 2, 3].map(i => (
+            <div key={i} style={{
+              background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+              borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div className="skeleton" style={{ height: '12px', width: '50%', borderRadius: '5px' }} />
+                <div className="skeleton" style={{ width: '28px', height: '28px', borderRadius: '8px' }} />
+              </div>
+              <div className="skeleton" style={{ height: '28px', width: '60%', borderRadius: '6px' }} />
+              <div className="skeleton" style={{ height: '10px', width: '80%', borderRadius: '5px' }} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="kpi-grid stagger">
+          <MetricCard
+            label="Vendas no mês"
+            value={String(metricas.vendasMes)}
+            sub="contratos fechados"
+            icon={<TrendingUp size={15} />}
+            trend={{ value: pct(metricas.vendasMes, metricas.vendasMesAnterior), positive: metricas.vendasMes >= metricas.vendasMesAnterior }}
+            highlight
+            delay={0}
+          />
+          <MetricCard
+            label="kWp Instalados"
+            value={`${metricas.kwpInstalados.toFixed(1)} kWp`}
+            sub="potência acumulada"
+            icon={<Zap size={15} />}
+            trend={{ value: pct(metricas.kwpInstalados, metricas.kwpAnterior), positive: metricas.kwpInstalados >= metricas.kwpAnterior }}
+            delay={70}
+          />
+          <MetricCard
+            label="Faturamento"
+            value={fmt(metricas.faturamento)}
+            sub="receita bruta estimada"
+            icon={<DollarSign size={15} />}
+            trend={{ value: pct(metricas.faturamento, metricas.faturamentoAnterior), positive: metricas.faturamento >= metricas.faturamentoAnterior }}
+            delay={140}
+          />
+          <MetricCard
+            label="Ticket Médio"
+            value={`R$ ${metricas.ticketMedio.toLocaleString('pt-BR')}`}
+            sub="por contrato"
+            icon={<Target size={15} />}
+            trend={{ value: pct(metricas.ticketMedio, metricas.ticketAnterior), positive: metricas.ticketMedio >= metricas.ticketAnterior }}
+            delay={210}
+          />
+        </div>
+      )}
 
       {/* ── Metas ── */}
       <div style={{ ...cardStyle }} className="animate-slideUp">

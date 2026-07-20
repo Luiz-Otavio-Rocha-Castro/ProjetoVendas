@@ -70,7 +70,7 @@ html {
 
 body {
   margin: 0;
-  min-height: 100vh;
+  min-height: 100dvh;
   background-color: var(--color-background);
 }
 
@@ -323,7 +323,7 @@ body {
 /* ─── App Shell ─── */
 .app-shell {
   display: flex;
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background: var(--color-background);
 }
@@ -414,7 +414,7 @@ body {
   /* Padding do conteúdo reduzido + espaço para bottom nav */
   .app-main {
     padding: 16px;
-    padding-bottom: 80px; /* espaço para a bottom nav não cobrir conteúdo */
+    padding-bottom: 96px; /* espaço seguro para a bottom nav + area de toque */
   }
 
   /* ─── Bottom Nav visível ─── */
@@ -532,7 +532,34 @@ body {
   }
   .app-main {
     padding: 12px;
-    padding-bottom: 80px;
+    padding-bottom: 96px;
   }
 }
 
+/* ─── Skeleton Loader ─── */
+@keyframes skeleton-pulse {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-2) 25%,
+    var(--color-border)    50%,
+    var(--color-surface-2) 75%
+  );
+  background-size: 800px 100%;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* ─── Hide scrollbar visually but keep functional ─── */
+.scroll-x-hidden {
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.scroll-x-hidden::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}

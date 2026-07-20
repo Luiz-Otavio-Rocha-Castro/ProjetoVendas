@@ -300,8 +300,26 @@ export default function DocumentosPage() {
       {/* ── Lista de documentos ── */}
       <div style={{ ...cardBase, overflow: 'hidden' }}>
         {loading ? (
-          <div style={{ padding: '48px', textAlign: 'center', color: 'var(--color-muted)' }}>
-            Carregando documentos...
+          /* Skeleton: linhas da tabela */
+          <div style={{ padding: '8px 0' }}>
+            {[0, 1, 2].map(i => (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'center', gap: '12px',
+                padding: '14px', borderBottom: '1px solid var(--color-border-soft)',
+              }}>
+                <div className="skeleton" style={{ width: '34px', height: '34px', borderRadius: '8px', flexShrink: 0 }} />
+                <div style={{ flex: 2, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div className="skeleton" style={{ height: '14px', width: '60%', borderRadius: '5px' }} />
+                  <div className="skeleton" style={{ height: '12px', width: '40%', borderRadius: '5px' }} />
+                </div>
+                <div className="skeleton" style={{ height: '12px', width: '60px', borderRadius: '5px', flexShrink: 0 }} />
+                <div className="skeleton" style={{ height: '12px', width: '80px', borderRadius: '5px', flexShrink: 0 }} />
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  <div className="skeleton" style={{ width: '36px', height: '36px', borderRadius: '7px' }} />
+                  <div className="skeleton" style={{ width: '36px', height: '36px', borderRadius: '7px' }} />
+                </div>
+              </div>
+            ))}
           </div>
         ) : filtrados.length === 0 ? (
           <div style={{ padding: '48px', textAlign: 'center', color: 'var(--color-muted)' }}>
@@ -388,15 +406,18 @@ export default function DocumentosPage() {
                     </td>
 
                     {/* Ações */}
-                    <td style={{ padding: '12px 14px', whiteSpace: 'nowrap' }}>
+                    <td style={{ padding: '8px 14px', whiteSpace: 'nowrap' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
                         <button
                           onClick={() => abrir(doc.id)}
                           title="Abrir PDF"
                           style={{
-                            padding: '6px', borderRadius: '7px', border: 'none', cursor: 'pointer',
+                            width: '44px', height: '44px',
+                            borderRadius: '7px', border: 'none', cursor: 'pointer',
                             background: 'transparent', color: 'var(--color-muted)',
-                            transition: 'all 0.15s ease', display: 'flex', alignItems: 'center',
+                            transition: 'all 0.15s ease',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            flexShrink: 0, position: 'relative', zIndex: 1,
                           }}
                           onMouseEnter={(e) => {
                             (e.currentTarget as HTMLButtonElement).style.background = 'var(--color-primary-light)'
@@ -407,15 +428,18 @@ export default function DocumentosPage() {
                             ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--color-muted)'
                           }}
                         >
-                          <Eye size={13} />
+                          <Eye size={15} />
                         </button>
                         <button
                           onClick={() => setConfirmDelete(doc.id)}
                           title="Remover documento"
                           style={{
-                            padding: '6px', borderRadius: '7px', border: 'none', cursor: 'pointer',
+                            width: '44px', height: '44px',
+                            borderRadius: '7px', border: 'none', cursor: 'pointer',
                             background: 'transparent', color: 'var(--color-muted)',
-                            transition: 'all 0.15s ease', display: 'flex', alignItems: 'center',
+                            transition: 'all 0.15s ease',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            flexShrink: 0, position: 'relative', zIndex: 1,
                           }}
                           onMouseEnter={(e) => {
                             (e.currentTarget as HTMLButtonElement).style.background = 'var(--color-danger-bg)'
@@ -426,7 +450,7 @@ export default function DocumentosPage() {
                             ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--color-muted)'
                           }}
                         >
-                          <Trash2 size={13} />
+                          <Trash2 size={15} />
                         </button>
                       </div>
                     </td>
