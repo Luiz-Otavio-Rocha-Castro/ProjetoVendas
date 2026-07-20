@@ -2,117 +2,139 @@ package com.minhavendas.vendas.services;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.minhavendas.vendas.model.Cliente;
 import com.minhavendas.vendas.model.Venda;
 import com.minhavendas.vendas.repository.ClienteRepository;
 import com.minhavendas.vendas.repository.VendaRepository;
-
 import com.minhavendas.vendas.dto.VendaDTO;
-
+import com.minhavendas.vendas.security.SecurityUtils;
 
 @Service
 public class VendaService {
+    
     @Autowired
     private VendaRepository vendaRepository;
-    private ModelMapper mapper = new ModelMapper();
+    
     @Autowired
     private ClienteRepository clienteRepository;
+    
+    private final ModelMapper mapper = new ModelMapper();
 
-    public List<VendaDTO> obterTodos(){
-        Integer vendedorId = com.minhavendas.vendas.security.SecurityUtils.getVendedorIdLogado();
-        List<Venda> Vendas = vendaRepository.findByVendedorIdOrVendedorIdIsNull(vendedorId);
-        return Vendas.stream()
-        .map(venda -> {
-           VendaDTO vendaDTO = mapper.map(venda, VendaDTO.class);
-           return vendaDTO;
-        })
-        .collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public List<VendaDTO> obterTodos() {
+        Integer vendedorId = getVendedorLogadoSeguro();
+        
+        // Mantemos "OrIsNull" por segurança de legado caso o usuário precise ver contratos antigos sem dono associado
+        // Mas o ideal para strict multitenancy seria: vendaRepository.findByVendedorId(vendedorId);
+        List<Venda> vendas = vendaRepository.findByVendedorIdOrVendedorIdIsNull(vendedorId);
+        
+        return vendas.stream()
+                .map(venda -> mapper.map(venda, VendaDTO.class))
+                .collect(Collectors.toList());
     } 
     
-    public VendaDTO obterVendaId(Integer id){
-        Optional<Venda> Venda = vendaRepository.findById(id);
-
-        if(Venda.isEmpty()){
-            throw new IllegalArgumentException("Não existe um venda com esse ID");
-        }
-        VendaDTO vendaDTO = mapper.map(Venda.get(), VendaDTO.class);
-        return vendaDTO;
+    @Transactional(readOnly = true)
+    public VendaDTO obterVendaId(Integer id) {
+        Venda venda = buscarVendaValidandoDono(id);
+        return mapper.map(venda, VendaDTO.class);
     }
 
-    //obter o id do cliente relacionado a venda;
-    public Integer obterIdClienteVenda(Integer idvenda){
-       VendaDTO vendaDTO = obterVendaId(idvenda);
-       return vendaDTO.getCliente().getId();
+    public Integer obterIdClienteVenda(Integer idvenda) {
+        Venda venda = buscarVendaValidandoDono(idvenda);
+        if (venda.getCliente() == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Venda não possui cliente vinculado");
+        }
+        return venda.getCliente().getId();
     }
     
-    public VendaDTO adicionar(VendaDTO vendaDto, Integer clienteId){
-        Optional<Cliente> cliente = clienteRepository.findById(clienteId);
+    @Transactional
+    public VendaDTO adicionar(VendaDTO vendaDto, Integer clienteId) {
+        Integer vendedorId = getVendedorLogadoSeguro();
+        Cliente cliente = buscarClienteOuLancarErro(clienteId);
+        
+        validarRegrasDeNegocioVenda(vendaDto);
+
         vendaDto.setId(null);
-
-        if(cliente.isEmpty()){
-            throw new IllegalArgumentException("Não existe um cliente com esse ID");
-        }
         vendaDto.setDataVenda(LocalDate.now());
-        vendaDto.setValorComissao(vendaDto.getValorTotal() * (vendaDto.getPercentualComissao()/100));
-        vendaDto.setCliente(cliente.get());
-
+        vendaDto.setValorComissao(vendaDto.getValorTotal() * (vendaDto.getPercentualComissao() / 100));
+        
         Venda venda = mapper.map(vendaDto, Venda.class);
-        venda.setVendedorId(com.minhavendas.vendas.security.SecurityUtils.getVendedorIdLogado());
+        venda.setCliente(cliente);
+        venda.setVendedorId(vendedorId);
+        
         venda = vendaRepository.save(venda);
-
         vendaDto.setId(venda.getId());
-
+        
         return vendaDto;
     }
 
-     public void deletar(Integer id){
-
-        Optional<Venda> venda = vendaRepository.findById(id);
-        if(venda.isEmpty()){
-            throw new IllegalArgumentException("Não existe uma venda com esse ID");
-        }
-        vendaRepository.deleteById(id);
+    @Transactional
+    public void deletar(Integer id) {
+        Venda venda = buscarVendaValidandoDono(id);
+        vendaRepository.delete(venda);
     }
 
-    public VendaDTO atualizar(VendaDTO vendaDto, Integer id, Integer clienteId){
-        Optional<Venda> venda = vendaRepository.findById(id);
+    @Transactional
+    public VendaDTO atualizar(VendaDTO vendaDto, Integer id, Integer clienteId) {
+        Venda vendaExistente = buscarVendaValidandoDono(id);
+        Cliente cliente = buscarClienteOuLancarErro(clienteId);
         
-        if(venda.isEmpty()){
-            throw new RuntimeException("Não existe uma venda com esse ID");
-        }
-        
-        if (vendaDto.getValorTotal() <= 0) {
-            throw new IllegalArgumentException("O valor total da venda deve ser maior que zero.");
-        }
+        validarRegrasDeNegocioVenda(vendaDto);
 
-        if (vendaDto.getPercentualComissao() < 0 || vendaDto.getPercentualComissao() > 100) {
-            throw new IllegalArgumentException("O percentual de comissão deve estar entre 0% e 100%.");
-        }
-        Optional<Cliente> cliente = clienteRepository.findById(clienteId);
-
-        if(cliente.isEmpty()){
-            throw new RuntimeException("Não existe um cliente com esse ID");
-        }
-        
         vendaDto.setId(id);
-        vendaDto.setDataVenda(venda.get().getDataVenda());
-        vendaDto.setValorComissao(vendaDto.getValorTotal() * (vendaDto.getPercentualComissao()/100));
-        vendaDto.setCliente(cliente.get());
-
-        Venda VENDA = mapper.map(vendaDto, Venda.class);
-        VENDA.setVendedorId(venda.get().getVendedorId());
-        vendaRepository.save(VENDA);
+        vendaDto.setDataVenda(vendaExistente.getDataVenda());
+        vendaDto.setValorComissao(vendaDto.getValorTotal() * (vendaDto.getPercentualComissao() / 100));
+        
+        Venda venda = mapper.map(vendaDto, Venda.class);
+        venda.setCliente(cliente);
+        venda.setVendedorId(vendaExistente.getVendedorId());
+        
+        vendaRepository.save(venda);
         return vendaDto;
-
     }
 
+    /* --- MÉTODOS PRIVADOS DE APOIO --- */
 
+    private Integer getVendedorLogadoSeguro() {
+        Integer id = SecurityUtils.getVendedorIdLogado();
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não autenticado");
+        }
+        return id;
+    }
+
+    private Venda buscarVendaValidandoDono(Integer id) {
+        Venda venda = vendaRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Venda não encontrada"));
+            
+        // PREVENÇÃO CONTRA IDOR: Se a venda tem dono e não é o logado, bloqueia.
+        if (venda.getVendedorId() != null && !venda.getVendedorId().equals(getVendedorLogadoSeguro())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para acessar esta venda");
+        }
+        return venda;
+    }
+
+    private Cliente buscarClienteOuLancarErro(Integer clienteId) {
+        return clienteRepository.findById(clienteId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado"));
+    }
+
+    private void validarRegrasDeNegocioVenda(VendaDTO vendaDto) {
+        if (vendaDto.getValorTotal() == null || vendaDto.getValorTotal() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O valor total da venda deve ser maior que zero.");
+        }
+        if (vendaDto.getPercentualComissao() == null || vendaDto.getPercentualComissao() < 0 || vendaDto.getPercentualComissao() > 100) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O percentual de comissão deve estar entre 0 e 100.");
+        }
+    }
 }
 

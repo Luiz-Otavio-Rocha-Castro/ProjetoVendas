@@ -81,10 +81,11 @@ public class WebSecurity {
             // 5. REGRAS DE ACESSO (Quem entra onde):
             // .requestMatchers("/auth/**").permitAll(): Abre uma EXCEÇÃO. Qualquer rota que comece com "/auth/"
             // (como /auth/login ou /auth/cadastro) está TOTALMENTE LIBERADA para qualquer um acessar sem token.
-            .authorizeHttpRequests(auth ->  auth.requestMatchers("/auth/**").permitAll()
-                                   .requestMatchers("/api/vendas-vendedor/**").permitAll()
-                                   .requestMatchers("/api/health").permitAll()
-                                .anyRequest().authenticated());
+            .authorizeHttpRequests(auth ->  auth
+                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/vendas-vendedor").permitAll()
+                .requestMatchers("/api/health").permitAll()
+                .anyRequest().authenticated());
             
         http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class);
 

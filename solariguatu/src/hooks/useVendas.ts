@@ -6,16 +6,28 @@ import { obterVendas, cadastrarVenda, atualizarVenda, deletarVenda } from '../se
 export function useVendas() {
   const [contratos, setContratos] = useState<Contrato[]>([])
   const [isLoading, setIsLoading] = useState(true)
-    useEffect(() => {
-    // Busca os dados da sua API do Spring Boot
+  const [isMutating, setIsMutating] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoading(true);
+    
     obterVendas()
       .then((dadosReais) => {
-        setContratos(dadosReais)
+        if (isMounted) setContratos(dadosReais);
       })
       .catch((erro) => {
-        console.error("Erro ao carregar contratos do backend:", erro)
+        if (isMounted) {
+          console.error("Erro ao carregar contratos:", erro);
+          setError("Falha ao carregar vendas da API.");
+        }
       })
-      .finally(() => setIsLoading(false))
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => { isMounted = false; };
   }, [])
 
   const [busca, setBusca] = useState('')
@@ -47,7 +59,6 @@ export function useVendas() {
     paginaAtual * itensPorPagina
   )
 
-  // Métricas gerais (sobre TODOS os contratos filtrados pelo mês)
   const totalVendas = useMemo(
     () => filtrados.reduce((s, c) => s + c.valorTotal, 0),
     [filtrados]
@@ -65,46 +76,64 @@ export function useVendas() {
     [contratosPendentes]
   )
 
-  const adicionarContrato = useCallback(async (dados: Omit<Contrato, 'id' | 'dataCriacao'>) => {
+  const adicionarContrato = useCallback(async (dados: Omit<Contrato, 'id' | 'dataCriacao'>): Promise<boolean> => {
+    if (isMutating) return false;
+    setIsMutating(true);
     try {
-      // Chama o service para cadastrar no backend
       const novo = await cadastrarVenda(dados)
-      // Atualiza o estado com o contrato que retornou do backend (com ID real)
       setContratos((prev) => [novo, ...prev])
       setPagina(1)
+      return true;
     } catch (erro) {
-      console.error("Erro ao cadastrar contrato no backend:", erro)
-      alert("Falha ao salvar a venda no sistema.")
+      console.error("Erro ao cadastrar contrato:", erro)
+      setError("Falha ao salvar a venda no sistema.")
+      return false;
+    } finally {
+      setIsMutating(false);
     }
-  }, [])
+  }, [isMutating])
 
-  const removerContrato = useCallback(async (id: string) => {
+  const removerContrato = useCallback(async (id: string): Promise<boolean> => {
+    if (isMutating) return false;
+    setIsMutating(true);
     try {
       const idNumerico = parseInt(id.replace(/\D/g, ''), 10);
       await deletarVenda(idNumerico);
       setContratos((prev) => prev.filter((c) => c.id !== id))
+      return true;
     } catch (erro) {
       console.error("Erro ao deletar contrato:", erro);
-      alert("Falha ao deletar a venda.");
+      setError("Falha ao deletar a venda.");
+      return false;
+    } finally {
+      setIsMutating(false);
     }
-  }, [])
+  }, [isMutating])
 
-  const editarContrato = useCallback(async (id: string, dados: Omit<Contrato, 'id' | 'dataCriacao'>) => {
+  const editarContrato = useCallback(async (id: string, dados: Omit<Contrato, 'id' | 'dataCriacao'>): Promise<boolean> => {
+    if (isMutating) return false;
+    setIsMutating(true);
     try {
       const idNumerico = parseInt(id.replace(/\D/g, ''), 10);
       const atualizado = await atualizarVenda(idNumerico, dados);
       setContratos((prev) =>
         prev.map((c) => (c.id === id ? { ...c, ...atualizado } : c))
       )
+      return true;
     } catch (erro) {
       console.error("Erro ao atualizar contrato:", erro);
-      alert("Falha ao atualizar a venda.");
+      setError("Falha ao atualizar a venda.");
+      return false;
+    } finally {
+      setIsMutating(false);
     }
-  }, [])
+  }, [isMutating])
 
   return {
     contratos,
     isLoading,
+    isMutating,
+    error,
     itensPagina,
     filtrados,
     busca,

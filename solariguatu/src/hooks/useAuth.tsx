@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react'
+import { api } from '../services/api'
 
 interface AuthState {
   isAuthenticated: boolean
@@ -8,18 +9,11 @@ interface AuthState {
 interface AuthContextData extends AuthState {
   login: (email: string, password: string) => Promise<boolean>
   logout: () => void
+  isLoading: boolean
+  error: string | null
 }
 
 const SESSION_KEY = 'solariguatu_auth'
-
-const MOCK_USER = {
-  name: 'Lucas Araújo',
-  email: 'lucas@solariguatu.com.br',
-  role: 'Gerente Comercial',
-  avatar: 'LA',
-}
-
-import { api } from '../services/api'
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData)
 
@@ -27,13 +21,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>(() => {
     try {
       const stored = sessionStorage.getItem(SESSION_KEY)
-      if (stored) return JSON.parse(stored) as AuthState
+      const token = localStorage.getItem('token')
+      // Previne falha fantasma: Só mantemos autênticado se o token e os dados existirem.
+      if (stored && token) return JSON.parse(stored) as AuthState
     } catch { /* noop */ }
     return { isAuthenticated: false, user: null }
   })
+  
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const login = useCallback(
     async (email: string, password: string): Promise<boolean> => {
+      if (isLoading) return false;
+      
+      setIsLoading(true)
+      setError(null)
       try {
         const response = await api.post('/auth/login', { email, password })
         
@@ -63,12 +66,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return true
         }
         return false
-      } catch (error) {
-        console.error("Erro no login:", error)
+      } catch (err: any) {
+        console.error("Erro no login:", err)
+        setError(err.response?.data?.message || "Credenciais inválidas ou erro no servidor.")
         return false
+      } finally {
+        setIsLoading(false)
       }
     },
-    []
+    [isLoading]
   )
 
   const logout = useCallback(() => {
@@ -77,8 +83,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState({ isAuthenticated: false, user: null })
   }, [])
 
+  // Proteção: Limpa o state caso o Axios intercepte e apague o token (Token Expirado)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      if (!localStorage.getItem('token')) {
+        logout();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [logout])
+
   return (
-    <AuthContext.Provider value={{ ...state, login, logout }}>
+    <AuthContext.Provider value={{ ...state, login, logout, isLoading, error }}>
       {children}
     </AuthContext.Provider>
   )
@@ -87,3 +104,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   return useContext(AuthContext)
 }
+

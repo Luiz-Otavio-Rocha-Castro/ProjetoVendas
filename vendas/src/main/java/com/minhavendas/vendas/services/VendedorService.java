@@ -1,17 +1,20 @@
 package com.minhavendas.vendas.services;
 
-import java.util.Optional;
 import java.io.IOException;
-import org.springframework.web.multipart.MultipartFile;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.minhavendas.vendas.model.Vendedor;
 import com.minhavendas.vendas.repository.VendedorRepository;
 import com.minhavendas.vendas.dto.VendedorDTO;
+import com.minhavendas.vendas.security.SecurityUtils;
 
 @Service
 public class VendedorService {
@@ -21,19 +24,19 @@ public class VendedorService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private ModelMapper mapper = new ModelMapper();
+    private final ModelMapper mapper = new ModelMapper();
 
     @Autowired
     private com.minhavendas.vendas.repository.VendaRepository vendaRepository;
 
+    @Transactional(readOnly = true)
     public VendedorDTO obterVendedorId(Integer id) {
-        Optional<Vendedor> vendedor = vendedorRepository.findById(id);
+        validarDono(id);
+        
+        Vendedor vendedor = vendedorRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vendedor não encontrado"));
 
-        if (vendedor.isEmpty()) {
-            throw new IllegalArgumentException("Não existe um vendedor com esse ID");
-        }
-
-        VendedorDTO dto = mapper.map(vendedor.get(), VendedorDTO.class);
+        VendedorDTO dto = mapper.map(vendedor, VendedorDTO.class);
 
         java.time.LocalDate hoje = java.time.LocalDate.now();
         java.time.LocalDate inicioMes = hoje.withDayOfMonth(1);
@@ -50,22 +53,24 @@ public class VendedorService {
         return dto;
     }
 
+    @Transactional
     public VendedorDTO adcionar(VendedorDTO vendedorDTO) {
+        if (vendedorDTO.getSenha() == null || vendedorDTO.getSenha().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Senha é obrigatória");
+        }
+        
         Vendedor vendedor = mapper.map(vendedorDTO, Vendedor.class);
-
-        String senhaLimpa = vendedor.getSenha();
-
-        String senhaCriptografada = passwordEncoder.encode(senhaLimpa);
-
-        vendedor.setSenha(senhaCriptografada);
-
+        vendedor.setSenha(passwordEncoder.encode(vendedor.getSenha()));
         vendedorRepository.save(vendedor);
 
         return mapper.map(vendedor, VendedorDTO.class);
     }
 
+    @Transactional
     public VendedorDTO atualizar(VendedorDTO vendedorDTO, Integer id) {
-        VendedorDTO vendedorAntigo = obterVendedorId(id);
+        validarDono(id);
+        Vendedor vendedorAntigo = vendedorRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vendedor não encontrado"));
 
         vendedorDTO.setId(id);
 
@@ -73,29 +78,54 @@ public class VendedorService {
             vendedorDTO.setSenha(vendedorAntigo.getSenha());
         } else {
             if (vendedorDTO.getSenhaAntiga() == null || vendedorDTO.getSenhaAntiga().trim().isEmpty()) {
-                throw new IllegalArgumentException("A senha atual é obrigatória para alterar a senha.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A senha atual é obrigatória para alterar a senha.");
             }
             if (!passwordEncoder.matches(vendedorDTO.getSenhaAntiga(), vendedorAntigo.getSenha())) {
-                throw new IllegalArgumentException("A senha atual informada está incorreta.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A senha atual informada está incorreta.");
             }
             vendedorDTO.setSenha(passwordEncoder.encode(vendedorDTO.getSenha()));
         }
 
         Vendedor vendedor = mapper.map(vendedorDTO, Vendedor.class);
+        // Protege campos sensíveis de serem sobrescritos por acidente
+        vendedor.setFotoPerfil(vendedorAntigo.getFotoPerfil()); 
+        
         vendedorRepository.save(vendedor);
         return vendedorDTO;
     }
 
+    @Transactional
     public void salvarFoto(Integer id, MultipartFile foto) throws IOException {
+        validarDono(id);
         Vendedor vendedor = vendedorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Vendedor não encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vendedor não encontrado"));
+        
+        if (foto.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Arquivo de foto inválido");
+        }
+        
         vendedor.setFotoPerfil(foto.getBytes());
         vendedorRepository.save(vendedor);
     }
 
+    @Transactional(readOnly = true)
     public byte[] obterFoto(Integer id) {
+        // A foto de perfil geralmente é pública dentro da empresa, mas se quiser fechar o IDOR:
+        validarDono(id); 
         Vendedor vendedor = vendedorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Vendedor não encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vendedor não encontrado"));
         return vendedor.getFotoPerfil();
     }
+    
+    /* --- MÉTODOS PRIVADOS --- */
+    private void validarDono(Integer id) {
+        Integer idLogado = SecurityUtils.getVendedorIdLogado();
+        if (idLogado == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não autenticado");
+        }
+        if (!idLogado.equals(id)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para alterar o perfil de outro vendedor.");
+        }
+    }
 }
+

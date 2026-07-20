@@ -1,17 +1,20 @@
 package com.minhavendas.vendas.services;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.minhavendas.vendas.dto.request.VisitaRequest;
 import com.minhavendas.vendas.dto.response.VisitaResponse;
 import com.minhavendas.vendas.model.Visita;
 import com.minhavendas.vendas.repository.VisitaRepository;
+import com.minhavendas.vendas.security.SecurityUtils;
 
 @Service
 public class VisitaService {
@@ -19,33 +22,45 @@ public class VisitaService {
     @Autowired
     private VisitaRepository visitaRepository;
 
-    private ModelMapper mapper = new ModelMapper();
+    private final ModelMapper mapper = new ModelMapper();
 
+    @Transactional(readOnly = true)
     public List<VisitaResponse> listarTodas() {
-        Integer vendedorId = com.minhavendas.vendas.security.SecurityUtils.getVendedorIdLogado();
+        Integer vendedorId = getVendedorLogadoSeguro();
         return visitaRepository.findByVendedorIdOrVendedorIdIsNull(vendedorId)
                 .stream()
                 .map(v -> mapper.map(v, VisitaResponse.class))
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public VisitaResponse adicionar(VisitaRequest request) {
+        Integer vendedorId = getVendedorLogadoSeguro();
+        
+        if (request.getNomeProspecto() == null || request.getNomeProspecto().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome do prospecto é obrigatório");
+        }
+
         if (request.getStatus() == null || request.getStatus().isBlank()) {
             request.setStatus("Agendada");
         }
+
         Visita visita = mapper.map(request, Visita.class);
         visita.setId(null);
-        visita.setVendedorId(com.minhavendas.vendas.security.SecurityUtils.getVendedorIdLogado());
+        visita.setVendedorId(vendedorId);
+        
         visita = visitaRepository.save(visita);
         return mapper.map(visita, VisitaResponse.class);
     }
 
+    @Transactional
     public VisitaResponse atualizar(Integer id, VisitaRequest request) {
-        Optional<Visita> opt = visitaRepository.findById(id);
-        if (opt.isEmpty()) {
-            throw new RuntimeException("Visita não encontrada: " + id);
+        Visita visita = buscarVisitaValidandoDono(id);
+        
+        if (request.getNomeProspecto() == null || request.getNomeProspecto().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome do prospecto é obrigatório");
         }
-        Visita visita = opt.get();
+
         visita.setNomeProspecto(request.getNomeProspecto());
         visita.setEndereco(request.getEndereco());
         visita.setDataVisita(request.getDataVisita());
@@ -54,14 +69,35 @@ public class VisitaService {
         visita.setAnotacoes(request.getAnotacoes());
         visita.setStatus(request.getStatus());
         visita.setAlertaEnviado(false); // Reseta o alerta caso ele mude o horário
+        
         visita = visitaRepository.save(visita);
         return mapper.map(visita, VisitaResponse.class);
     }
 
+    @Transactional
     public void deletar(Integer id) {
-        if (!visitaRepository.existsById(id)) {
-            throw new RuntimeException("Visita não encontrada: " + id);
+        Visita visita = buscarVisitaValidandoDono(id);
+        visitaRepository.delete(visita);
+    }
+
+    /* --- MÉTODOS PRIVADOS DE APOIO --- */
+
+    private Integer getVendedorLogadoSeguro() {
+        Integer id = SecurityUtils.getVendedorIdLogado();
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não autenticado");
         }
-        visitaRepository.deleteById(id);
+        return id;
+    }
+
+    private Visita buscarVisitaValidandoDono(Integer id) {
+        Visita visita = visitaRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Visita não encontrada: " + id));
+            
+        if (visita.getVendedorId() != null && !visita.getVendedorId().equals(getVendedorLogadoSeguro())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para acessar esta visita");
+        }
+        return visita;
     }
 }
+
