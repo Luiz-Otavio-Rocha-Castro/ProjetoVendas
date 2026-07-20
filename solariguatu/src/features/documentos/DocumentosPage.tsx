@@ -417,7 +417,7 @@ export default function DocumentosPage() {
                             background: 'transparent', color: 'var(--color-muted)',
                             transition: 'all 0.15s ease',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            flexShrink: 0, position: 'relative', zIndex: 1,
+                            flexShrink: 0,
                           }}
                           onMouseEnter={(e) => {
                             (e.currentTarget as HTMLButtonElement).style.background = 'var(--color-primary-light)'
@@ -439,7 +439,7 @@ export default function DocumentosPage() {
                             background: 'transparent', color: 'var(--color-muted)',
                             transition: 'all 0.15s ease',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            flexShrink: 0, position: 'relative', zIndex: 1,
+                            flexShrink: 0,
                           }}
                           onMouseEnter={(e) => {
                             (e.currentTarget as HTMLButtonElement).style.background = 'var(--color-danger-bg)'

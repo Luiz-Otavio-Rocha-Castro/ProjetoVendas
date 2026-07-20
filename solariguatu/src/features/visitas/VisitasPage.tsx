@@ -114,6 +114,7 @@ function VisitaModal({ visita, clientes, onClose, onSave }: ModalProps) {
         style={{
           background: 'var(--color-surface)', borderRadius: '16px',
           padding: '24px', width: '100%', maxWidth: '440px',
+          maxHeight: '90dvh', overflowY: 'auto',
           border: '1px solid var(--color-border)',
           boxShadow: '0 24px 64px rgba(15,25,41,0.25)',
         }}
