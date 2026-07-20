@@ -55,8 +55,8 @@ export async function listarClientes(): Promise<ClienteSimples[]> {
   return resp.data
 }
 
-/** Abre o PDF no browser — faz fetch autenticado e cria blob URL */
-export async function abrirDocumento(id: number): Promise<void> {
+/** Baixa o PDF no browser (força o download para contornar bloqueio de popups no iOS) */
+export async function abrirDocumento(id: number, nomeArquivo: string = `documento_${id}.pdf`): Promise<void> {
   const base = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8080'
   const token = localStorage.getItem('token') || ''
 
@@ -68,7 +68,14 @@ export async function abrirDocumento(id: number): Promise<void> {
 
   const blob = await response.blob()
   const url = URL.createObjectURL(blob)
-  window.open(url, '_blank')
+  
+  const a = document.createElement('a')
+  a.href = url
+  a.download = nomeArquivo
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+
   // Libera a URL após 60 s
   setTimeout(() => URL.revokeObjectURL(url), 60_000)
 }

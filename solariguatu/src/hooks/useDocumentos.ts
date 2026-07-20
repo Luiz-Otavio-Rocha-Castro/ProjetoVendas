@@ -66,11 +66,11 @@ export function useDocumentos() {
     }
   }, [])
 
-  const abrir = useCallback(async (id: number) => {
+  const abrir = useCallback(async (id: number, nomeArquivo?: string) => {
     try {
-      await abrirDocumento(id)
+      await abrirDocumento(id, nomeArquivo)
     } catch {
-      setError('Erro ao abrir documento.')
+      setError('Erro ao baixar documento.')
     }
   }, [])
 

@@ -409,8 +409,8 @@ export default function DocumentosPage() {
                     <td style={{ padding: '8px 14px', whiteSpace: 'nowrap' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
                         <button
-                          onClick={() => abrir(doc.id)}
-                          title="Abrir PDF"
+                          onClick={() => abrir(doc.id, doc.nomeArquivo)}
+                          title="Baixar PDF"
                           style={{
                             width: '44px', height: '44px',
                             borderRadius: '7px', border: 'none', cursor: 'pointer',
