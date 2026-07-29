@@ -9,13 +9,21 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 @Entity
+@FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = Integer.class)})
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 public class Documento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Column(name = "tenant_id")
+    private Integer tenantId;
 
     private String nomeArquivo;
 
@@ -55,4 +63,7 @@ public class Documento {
 
     public Cliente getCliente() { return cliente; }
     public void setCliente(Cliente cliente) { this.cliente = cliente; }
+
+    public Integer getTenantId() { return tenantId; }
+    public void setTenantId(Integer tenantId) { this.tenantId = tenantId; }
 }

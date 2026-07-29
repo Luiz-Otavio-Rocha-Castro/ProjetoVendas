@@ -22,7 +22,24 @@ public class AuthService {
     @Autowired // Pega o Gerente de Autenticação configurado na sua classe WebSecurity.
     private AuthenticationManager authenticationManager;
     
+    @Autowired
+    private com.minhavendas.vendas.repository.VendedorRepository vendedorRepository;
+
+    @Autowired
+    private com.minhavendas.vendas.repository.TenantRepository tenantRepository;
+
     public AcessDTO login(AuthenticationDTO authDto){
+        // Verifica o e-mail antes de autenticar para dar uma mensagem clara
+        com.minhavendas.vendas.model.Vendedor vendedor = vendedorRepository.findByEmail(authDto.getEmail())
+            .orElseThrow(() -> new BadCredentialsException("Usuário não encontrado."));
+
+        if (Boolean.FALSE.equals(vendedor.getEmailVerificado())) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.FORBIDDEN, 
+                "E-mail não verificado. Por favor, verifique sua caixa de entrada para ativar a conta."
+            );
+        }
+
         // 1. Cria o 'crachá temporário' (intenção de login) usando o e-mail e a senha que vieram do React
         UsernamePasswordAuthenticationToken userAuth = 
         new UsernamePasswordAuthenticationToken(authDto.getEmail(), authDto.getPassword());
@@ -41,6 +58,14 @@ public class AuthService {
         vendedorDTO.setId(userAuthenticate.getId());
         vendedorDTO.setNome(userAuthenticate.getNome());
         vendedorDTO.setEmail(userAuthenticate.getUsername());
+        
+        // WHITE LABEL: Buscar o Tenant para injetar o nome e a logo no frontend
+        if (vendedor.getTenantId() != null) {
+            tenantRepository.findById(vendedor.getTenantId()).ifPresent(tenant -> {
+                vendedorDTO.setEmpresaNome(tenant.getNomeEmpresa());
+                vendedorDTO.setEmpresaLogo(tenant.getLogoUrl());
+            });
+        }
         
         return new AcessDTO(token, vendedorDTO);
     }

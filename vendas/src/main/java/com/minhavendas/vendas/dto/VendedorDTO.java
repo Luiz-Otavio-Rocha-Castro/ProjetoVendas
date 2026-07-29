@@ -24,6 +24,10 @@ public class VendedorDTO {
 
     private Integer contratosAtual;
 
+    private String empresaNome;
+
+    private String empresaLogo;
+
     //#endregion
 
     //#region GEts e setters
@@ -113,6 +117,22 @@ public class VendedorDTO {
 
     public void setContratosAtual(Integer contratosAtual) {
         this.contratosAtual = contratosAtual;
+    }
+
+    public String getEmpresaNome() {
+        return empresaNome;
+    }
+
+    public void setEmpresaNome(String empresaNome) {
+        this.empresaNome = empresaNome;
+    }
+
+    public String getEmpresaLogo() {
+        return empresaLogo;
+    }
+
+    public void setEmpresaLogo(String empresaLogo) {
+        this.empresaLogo = empresaLogo;
     }
     
     //#endregion

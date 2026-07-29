@@ -3,10 +3,7 @@ import axios from 'axios';
 
 export const api = axios.create({
   // Tenta usar a URL da variável de ambiente, se não achar (como rodando local), usa o localhost
-  baseURL: (import.meta as any).env?.VITE_API_URL || 'http://localhost:8080', 
-  headers: {
-    'Content-Type': 'application/json',
-  }
+  baseURL: (import.meta as any).env?.VITE_API_URL || 'http://localhost:8080'
 });
 
 api.interceptors.request.use((config) => {

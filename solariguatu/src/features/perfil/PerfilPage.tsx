@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, type FormEvent } from 'react'
 import {
   User, Mail, MapPin, Target, Zap,
   Save, Lock, Eye, EyeOff, TrendingUp,
-  CheckCircle2, Edit3, LogOut,
+  CheckCircle2, Edit3, LogOut, Building, Upload
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
@@ -10,6 +10,7 @@ import { usePerfil } from '../../hooks/usePerfil'
 import { useToast } from '../../contexts/ToastContext'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
+import { tenantService } from '../../services/tenant/tenantService'
 
 function ProgressBar({ value, max, color }: { value: number; max: number; color: string }) {
   const pct = Math.min(100, Math.round((value / max) * 100))
@@ -45,10 +46,11 @@ function Section({ title, icon, children }: { title: string; icon: React.ReactNo
 
 export default function PerfilPage() {
   const { perfil, saving, loading, updatePerfil, uploadFoto } = usePerfil()
-  const { logout } = useAuth()
+  const { logout, user, updateUser } = useAuth()
   const navigate = useNavigate()
   const { toast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const logoInputRef = useRef<HTMLInputElement>(null)
 
   // Form state
   const [nome, setNome] = useState(perfil.nome)
@@ -60,6 +62,10 @@ export default function PerfilPage() {
   const [senhaAtual, setSenhaAtual] = useState('')
   const [novaSenha, setNovaSenha] = useState('')
   const [showSenha, setShowSenha] = useState(false)
+
+  // Tenant / Company state
+  const [nomeEmpresa, setNomeEmpresa] = useState(user?.empresaNome || '')
+  const [empresaSaving, setEmpresaSaving] = useState(false)
 
   // Image error state
   const [imgError, setImgError] = useState(false)
@@ -120,6 +126,52 @@ export default function PerfilPage() {
         toast('success', 'Foto atualizada!', 'Sua foto de perfil foi alterada com sucesso.')
       } catch {
         toast('error', 'Erro no upload', 'Não foi possível salvar a foto.')
+      }
+    }
+  }
+
+  const handleSaveEmpresa = async (e: FormEvent) => {
+    e.preventDefault()
+    if (!nomeEmpresa.trim()) { toast('error', 'Campo obrigatório', 'O nome da empresa não pode estar vazio.'); return }
+    
+    setEmpresaSaving(true)
+    try {
+      await tenantService.atualizarConfig({ nomeEmpresa: nomeEmpresa.trim() })
+      updateUser({ empresaNome: nomeEmpresa.trim() })
+      toast('success', 'Empresa atualizada!', 'O nome da sua empresa foi alterado.')
+    } catch {
+      toast('error', 'Erro ao salvar', 'Não foi possível atualizar os dados da empresa.')
+    } finally {
+      setEmpresaSaving(false)
+    }
+  }
+
+  const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0]
+      if (file.size > 5 * 1024 * 1024) {
+        toast('error', 'Arquivo muito grande', 'A logo deve ter no máximo 5MB.')
+        return
+      }
+      setEmpresaSaving(true)
+      try {
+        await tenantService.uploadLogo(file)
+        
+        // Em um app real a API retornaria a URL, 
+        // mas como estamos apenas gravando Base64, podemos ler aqui para preview rápido
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          if (reader.result) {
+            updateUser({ empresaLogo: reader.result.toString() })
+          }
+        };
+
+        toast('success', 'Logo atualizada!', 'A logo da sua empresa foi alterada.')
+      } catch {
+        toast('error', 'Erro no upload', 'Não foi possível salvar a logo da empresa.')
+      } finally {
+        setEmpresaSaving(false)
       }
     }
   }
@@ -383,6 +435,61 @@ export default function PerfilPage() {
                 >
                   Alterar Senha
                 </Button>
+              </div>
+            </form>
+          </Section>
+
+          {/* Minha Empresa (White Label) */}
+          <Section title="Minha Empresa (White Label)" icon={<Building size={16} />}>
+            <form onSubmit={handleSaveEmpresa} className="flex flex-col gap-4">
+              <div
+                className="flex items-center gap-2 px-4 py-3 rounded-xl text-xs"
+                style={{ background: 'var(--color-primary-subtle)', color: 'var(--color-primary)', border: '1px solid var(--color-primary-glow)' }}
+              >
+                <CheckCircle2 size={13} />
+                Personalize o sistema com a marca da sua empresa. As alterações aparecerão instantaneamente.
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-6 items-start mt-2">
+                {/* Logo Upload */}
+                <div className="flex flex-col items-center gap-2">
+                  <div className="text-xs font-semibold" style={{ color: 'var(--color-foreground)' }}>Sua Logo</div>
+                  <input type="file" ref={logoInputRef} onChange={handleLogoChange} accept="image/*" className="hidden" />
+                  <div
+                    className="w-20 h-20 rounded-xl flex items-center justify-center cursor-pointer transition-all hover:opacity-80"
+                    style={{ background: 'var(--color-surface-2)', border: '1px dashed var(--color-border)' }}
+                    onClick={() => logoInputRef.current?.click()}
+                  >
+                    {user?.empresaLogo ? (
+                      <img src={user.empresaLogo} alt="Logo" className="w-full h-full object-contain p-2" />
+                    ) : (
+                      <Upload size={20} style={{ color: 'var(--color-muted)' }} />
+                    )}
+                  </div>
+                  <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>Recomendado: 400x400</div>
+                </div>
+
+                {/* Nome da Empresa */}
+                <div className="flex-1 w-full">
+                  <Input
+                    label="Nome da Empresa"
+                    value={nomeEmpresa}
+                    onChange={(e) => setNomeEmpresa(e.target.value)}
+                    leftIcon={<Building size={14} />}
+                    placeholder="Sua Integradora Solar"
+                  />
+                  <div className="flex justify-end pt-4">
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      size="md"
+                      loading={empresaSaving}
+                      leftIcon={empresaSaving ? undefined : <Save size={15} />}
+                    >
+                      {empresaSaving ? 'Salvando...' : 'Salvar Empresa'}
+                    </Button>
+                  </div>
+                </div>
               </div>
             </form>
           </Section>

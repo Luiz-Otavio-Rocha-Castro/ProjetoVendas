@@ -58,8 +58,17 @@ public class VendedorService {
         if (vendedorDTO.getSenha() == null || vendedorDTO.getSenha().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Senha é obrigatória");
         }
-        
+
+        // Valida formato do e-mail antes de tentar salvar
+        com.minhavendas.vendas.util.EmailValidator.validarOuLancarErro(vendedorDTO.getEmail());
+
+        // Verifica se o e-mail já está em uso
+        if (vendedorRepository.findByEmail(vendedorDTO.getEmail().trim().toLowerCase()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este e-mail já está cadastrado.");
+        }
+
         Vendedor vendedor = mapper.map(vendedorDTO, Vendedor.class);
+        vendedor.setEmail(vendedor.getEmail().trim().toLowerCase());
         vendedor.setSenha(passwordEncoder.encode(vendedor.getSenha()));
         vendedorRepository.save(vendedor);
 

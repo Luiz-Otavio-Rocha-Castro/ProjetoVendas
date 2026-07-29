@@ -85,6 +85,7 @@ public class WebSecurity {
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/vendas-vendedor").permitAll()
                 .requestMatchers("/api/health").permitAll()
+                .requestMatchers("/billing/webhook").permitAll() // Chamado pelo gateway, autenticado via HMAC
                 .anyRequest().authenticated());
             
         http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class);

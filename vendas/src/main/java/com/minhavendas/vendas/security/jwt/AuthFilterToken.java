@@ -12,6 +12,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.minhavendas.vendas.security.TenantContext;
 import com.minhavendas.vendas.security.VendedorDetails;
 
 import io.jsonwebtoken.Claims;
@@ -34,28 +35,53 @@ public class AuthFilterToken extends OncePerRequestFilter {
             String jwt = getToken(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
 
-                // TRUE STATELESS: Não consultamos mais o banco de dados aqui.
-                // Extraímos os dados diretamente das "Claims" (cargas) do JWT.
+                // TRUE STATELESS: Todos os dados de sessão vêm das Claims do JWT assinado.
                 Claims claims = jwtUtils.getClaimsFromToken(jwt);
                 String username = claims.getSubject();
-                Integer id = claims.get("id", Integer.class);
-                String nome = claims.get("nome", String.class);
+                Integer id      = claims.get("id", Integer.class);
+                String nome     = claims.get("nome", String.class);
+                Integer tenantId = claims.get("tenantId", Integer.class);
+                String subscriptionStatus = claims.get("subscriptionStatus", String.class);
 
-                // Criamos o usuário em memória apenas com o necessário para a Sessão, evitando I/O no banco.
-                VendedorDetails userDetails = new VendedorDetails(id, nome, username, null, new ArrayList<>());
+                // GUARDA DE ASSINATURA: Bloqueia acesso antes de qualquer Controller.
+                // Contas canceladas ou inativas ficam travadas aqui, sem precisar checar em cada Service.
+                if ("CANCELED".equals(subscriptionStatus) || "INACTIVE".equals(subscriptionStatus)) {
+                    logger.warn("Acesso negado para user={} com subscriptionStatus={}", username, subscriptionStatus);
+                    response.setStatus(HttpServletResponse.SC_PAYMENT_REQUIRED); // 402
+                    response.setContentType("application/json");
+                    response.getWriter().write(
+                        "{\"error\":\"Assinatura inativa. Renove seu plano para continuar.\"}"
+                    );
+                    return; // Interrompe a cadeia de filtros sem chamar o Controller
+                }
 
-                UsernamePasswordAuthenticationToken auth = 
+                // Popula o ThreadLocal com o tenantId para o TenantFilterAspect
+                if (tenantId != null) {
+                    TenantContext.setCurrentTenant(tenantId);
+                } else {
+                    logger.warn("tenantId ausente no JWT para user={}. Verifique o cadastro do Tenant.", username);
+                }
+
+                // Reconstrói o VendedorDetails em memória com contexto completo (sem bater no banco)
+                VendedorDetails userDetails = new VendedorDetails(
+                    id, nome, username, null,
+                    tenantId, subscriptionStatus,
+                    new ArrayList<>()
+                );
+
+                UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         } catch (Exception e) {
-            logger.error("Ocorreu um erro ao processar o token JWT: {}", e.getMessage(), e);
+            logger.error("Erro ao processar token JWT: {}", e.getMessage(), e);
+        } finally {
+            filterChain.doFilter(request, response);
+            // CRÍTICO: Limpa o TenantContext para evitar memory leak no pool de Threads do Tomcat
+            TenantContext.clear();
         }
-
-        filterChain.doFilter(request, response);
     }
 
     private String getToken(HttpServletRequest request) {
@@ -66,4 +92,3 @@ public class AuthFilterToken extends OncePerRequestFilter {
         return null;
     }
 }
-

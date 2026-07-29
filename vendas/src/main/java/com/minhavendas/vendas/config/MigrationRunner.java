@@ -1,0 +1,60 @@
+package com.minhavendas.vendas.config;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import com.minhavendas.vendas.repository.VendedorRepository;
+import com.minhavendas.vendas.repository.TenantRepository;
+import com.minhavendas.vendas.model.Vendedor;
+import com.minhavendas.vendas.model.Tenant;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Component
+public class MigrationRunner implements CommandLineRunner {
+    
+    private static final Logger logger = LoggerFactory.getLogger(MigrationRunner.class);
+
+    @Autowired
+    private VendedorRepository vendedorRepository;
+
+    @Autowired
+    private TenantRepository tenantRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Override
+    public void run(String... args) throws Exception {
+        logger.info("Executando MigrationRunner para atualizar tenant_id...");
+        if (tenantRepository.findById(1).isEmpty()) {
+            Tenant t = new Tenant();
+            t.setNomeEmpresa("Minha Empresa");
+            t.setSubscriptionStatus("ACTIVE");
+            tenantRepository.save(t);
+            logger.info("Criado Tenant padrão (ID 1).");
+        }
+
+        List<Vendedor> semTenant = vendedorRepository.findAll().stream()
+            .filter(v -> v.getTenantId() == null)
+            .collect(Collectors.toList());
+            
+        for(Vendedor v : semTenant) {
+            v.setTenantId(1);
+            vendedorRepository.save(v);
+        }
+
+        try {
+            jdbcTemplate.execute("UPDATE cliente SET tenant_id = 1 WHERE tenant_id IS NULL");
+            jdbcTemplate.execute("UPDATE venda SET tenant_id = 1 WHERE tenant_id IS NULL");
+            jdbcTemplate.execute("UPDATE visita SET tenant_id = 1 WHERE tenant_id IS NULL");
+            jdbcTemplate.execute("UPDATE documento SET tenant_id = 1 WHERE tenant_id IS NULL");
+            logger.info("Registros antigos atualizados para tenant_id = 1 com sucesso.");
+        } catch (Exception e) {
+            logger.error("Erro ao rodar migração de dados no BD: " + e.getMessage());
+        }
+    }
+}

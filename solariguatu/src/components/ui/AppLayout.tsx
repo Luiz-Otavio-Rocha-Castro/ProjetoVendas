@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, FileText, LogOut,
-  Zap, Bell, AlertCircle, FolderOpen, UserCircle, ChevronRight, MapPin,
+  Zap, Bell, AlertCircle, FolderOpen, UserCircle, ChevronRight, MapPin, Sun
 } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { api } from '../../services/api'
@@ -107,21 +107,35 @@ export default function AppLayout() {
       ════════════════════════════════ */}
       <aside className="app-sidebar">
 
-        {/* ── Logo ── */}
+        {/* ── Logo / White Label ── */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: '16px 20px',
           borderBottom: '1px solid var(--color-navy-border)',
+          minHeight: '74px'
         }}>
-          <img
-            src="/logo.jpg"
-            alt="SolarIguatu"
-            style={{
-              height: '42px',
-              objectFit: 'contain',
-              filter: 'brightness(1.05)',
-            }}
-          />
+          {user?.empresaLogo ? (
+            <img
+              src={user.empresaLogo}
+              alt={user?.empresaNome || "Empresa"}
+              style={{
+                maxHeight: '42px',
+                maxWidth: '100%',
+                objectFit: 'contain',
+                filter: 'brightness(1.05)',
+              }}
+            />
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Sun size={24} color="#E8901A" />
+              <h2 style={{
+                color: '#FFF', margin: 0, fontSize: '1.1rem', fontWeight: 800,
+                fontFamily: 'var(--font-display)', textAlign: 'left', lineHeight: 1.2
+              }}>
+                {user?.empresaNome || "Solvy"}
+              </h2>
+            </div>
+          )}
         </div>
 
         {/* ── Nav label ── */}
@@ -266,15 +280,17 @@ export default function AppLayout() {
           {/* Logo (mobile only) + title */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             {/* Logo só aparece no mobile (quando sidebar está oculta) */}
-            <img
-              src="/logo.jpg"
-              alt="SolarIguatu"
-              style={{
-                height: '32px',
-                objectFit: 'contain',
-              }}
-              className="mobile-logo"
-            />
+            <div className="mobile-logo">
+              {user?.empresaLogo ? (
+                <img
+                  src={user.empresaLogo}
+                  alt={user?.empresaNome || "Empresa"}
+                  style={{ height: '32px', objectFit: 'contain' }}
+                />
+              ) : (
+                <Sun size={28} color="#E8901A" />
+              )}
+            </div>
             {/* Título com barra — oculto no mobile pela classe topbar-title */}
             <div className="topbar-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <div style={{

@@ -8,13 +8,21 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 @Entity
+@FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = Integer.class)})
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 public class Visita {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Column(name = "tenant_id")
+    private Integer tenantId;
 
     private String nomeProspecto;
 
@@ -65,4 +73,7 @@ public class Visita {
 
     public Integer getVendedorId() { return vendedorId; }
     public void setVendedorId(Integer vendedorId) { this.vendedorId = vendedorId; }
+
+    public Integer getTenantId() { return tenantId; }
+    public void setTenantId(Integer tenantId) { this.tenantId = tenantId; }
 }

@@ -8,8 +8,10 @@ import org.springframework.stereotype.Repository;
 import com.minhavendas.vendas.model.Vendedor;
 
 @Repository
-public interface VendedorRepository extends JpaRepository<Vendedor,Integer>{
+public interface VendedorRepository extends JpaRepository<Vendedor, Integer> {
     
     Optional<Vendedor> findByEmail(String email);
+
+    Optional<Vendedor> findByTokenVerificacao(String tokenVerificacao);
 
 }

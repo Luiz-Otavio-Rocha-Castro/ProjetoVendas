@@ -25,8 +25,20 @@ public class Vendedor {
 
     private Double metaKwp;
 
+    // Vínculo Multi-Tenant: qual empresa este vendedor pertence
+    @jakarta.persistence.Column(name = "tenant_id")
+    private Integer tenantId;
+
     @jakarta.persistence.Column(columnDefinition = "bytea")
     private byte[] fotoPerfil;
+
+    // Campos de Verificação de E-mail
+    private Boolean emailVerificado = false; // Default: conta nasce bloqueada
+    
+    @jakarta.persistence.Column(unique = true)
+    private String tokenVerificacao;
+    
+    private java.time.LocalDateTime dataExpiracaoToken;
 
     // #endregion
 
@@ -94,6 +106,18 @@ public class Vendedor {
     public void setFotoPerfil(byte[] fotoPerfil) {
         this.fotoPerfil = fotoPerfil;
     }
+
+    public Integer getTenantId() { return tenantId; }
+    public void setTenantId(Integer tenantId) { this.tenantId = tenantId; }
+
+    public Boolean getEmailVerificado() { return emailVerificado; }
+    public void setEmailVerificado(Boolean emailVerificado) { this.emailVerificado = emailVerificado; }
+
+    public String getTokenVerificacao() { return tokenVerificacao; }
+    public void setTokenVerificacao(String tokenVerificacao) { this.tokenVerificacao = tokenVerificacao; }
+
+    public java.time.LocalDateTime getDataExpiracaoToken() { return dataExpiracaoToken; }
+    public void setDataExpiracaoToken(java.time.LocalDateTime dataExpiracaoToken) { this.dataExpiracaoToken = dataExpiracaoToken; }
 
     // #endregion
 }

@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './hooks/useAuth'
 import { ToastProvider } from './contexts/ToastContext'
 import LoginPage from './features/auth/LoginPage'
+import SignupPage from './features/auth/SignupPage'
+import VerifyEmailPage from './features/auth/VerifyEmailPage'
 import AppLayout from './components/ui/AppLayout'
 import DashboardPage from './features/dashboard/DashboardPage'
 import VendasPage from './features/vendas/VendasPage'
@@ -19,6 +21,14 @@ export default function App() {
         <Route
           path="/login"
           element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />}
+        />
+        <Route
+          path="/cadastro"
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignupPage />}
+        />
+        <Route
+          path="/verificar-email"
+          element={<VerifyEmailPage />}
         />
         <Route
           path="/"

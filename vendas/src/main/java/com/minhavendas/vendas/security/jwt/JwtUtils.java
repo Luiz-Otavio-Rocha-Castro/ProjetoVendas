@@ -36,6 +36,8 @@ public class JwtUtils {
                 .setSubject(vendedorDetails.getUsername())
                 .claim("id", vendedorDetails.getId())
                 .claim("nome", vendedorDetails.getNome())
+                .claim("tenantId", vendedorDetails.getTenantId())
+                .claim("subscriptionStatus", vendedorDetails.getSubscriptionStatus())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date().getTime()) + jwtExpirationsMs))
                 .signWith(getSigninKey())

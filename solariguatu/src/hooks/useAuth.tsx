@@ -3,17 +3,26 @@ import { api } from '../services/api'
 
 interface AuthState {
   isAuthenticated: boolean
-  user: { id: number; name: string; email: string; role: string; avatar: string } | null
+  user: { 
+    id: number; 
+    name: string; 
+    email: string; 
+    role: string; 
+    avatar: string;
+    empresaNome?: string;
+    empresaLogo?: string;
+  } | null
 }
 
 interface AuthContextData extends AuthState {
   login: (email: string, password: string) => Promise<boolean>
   logout: () => void
+  updateUser: (partialUser: Partial<Exclude<AuthState['user'], null>>) => void
   isLoading: boolean
   error: string | null
 }
 
-const SESSION_KEY = 'solariguatu_auth'
+const SESSION_KEY = 'solari_auth'
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData)
 
@@ -58,7 +67,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               name: nomeVendedor, 
               email: vendedor.email || email,
               role: 'Vendedor',
-              avatar: avatar
+              avatar: avatar,
+              empresaNome: vendedor.empresaNome,
+              empresaLogo: vendedor.empresaLogo
             }, 
           }
           sessionStorage.setItem(SESSION_KEY, JSON.stringify(next))
@@ -76,6 +87,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     [isLoading]
   )
+
+  const updateUser = useCallback((partialUser: Partial<Exclude<AuthState['user'], null>>) => {
+    setState(prev => {
+      if (!prev.user) return prev
+      const nextUser = { ...prev.user, ...partialUser }
+      const nextState = { ...prev, user: nextUser }
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(nextState))
+      return nextState
+    })
+  }, [])
 
   const logout = useCallback(() => {
     localStorage.removeItem('token')
@@ -95,7 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [logout])
 
   return (
-    <AuthContext.Provider value={{ ...state, login, logout, isLoading, error }}>
+    <AuthContext.Provider value={{ ...state, login, logout, updateUser, isLoading, error }}>
       {children}
     </AuthContext.Provider>
   )
