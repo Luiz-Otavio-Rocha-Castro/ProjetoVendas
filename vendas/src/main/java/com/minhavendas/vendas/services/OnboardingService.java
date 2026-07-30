@@ -94,7 +94,12 @@ public class OnboardingService {
                 t.setNomeEmpresa(request.getNomeEmpresa().trim());
                 t.setCnpj(request.getCnpj());
                 t.setSubscriptionStatus(SubscriptionService.STATUS_TRIAL);
-                tenantRepository.save(t);
+                try {
+                    tenantRepository.save(t);
+                } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT,
+                            "O nome da empresa '" + t.getNomeEmpresa() + "' jA estA em uso. Tente outro nome.");
+                }
                 
                 emailService.enviarEmailVerificacao(v.getEmail(), v.getNome(), token);
                 
@@ -115,7 +120,12 @@ public class OnboardingService {
         tenant.setNomeEmpresa(request.getNomeEmpresa().trim());
         tenant.setCnpj(request.getCnpj());
         tenant.setSubscriptionStatus(SubscriptionService.STATUS_TRIAL); // Começa em período de teste
-        tenant = tenantRepository.save(tenant);
+        try {
+            tenant = tenantRepository.save(tenant);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "O nome da empresa '" + tenant.getNomeEmpresa() + "' jA estA em uso no sistema. Por favor, tente um nome diferente ou adicione um sufixo (Ex: Empresa Filial).");
+        }
 
         logger.info("Tenant criado: id={}, empresa='{}'", tenant.getId(), tenant.getNomeEmpresa());
 
