@@ -101,10 +101,10 @@ export default function NovoContratoModal({ open, onClose, onSave, initialData, 
     if (!form.cliente.trim())  e.cliente    = 'Campo obrigatório'
     
     const cpfDigitCount = form.cpfCnpj.replace(/\D/g, '').length
-    if (cpfDigitCount !== 11) e.cpfCnpj = 'O CPF deve ter exatamente 11 números'
+    if (cpfDigitCount > 0 && cpfDigitCount !== 11 && cpfDigitCount !== 14) e.cpfCnpj = 'O CPF/CNPJ deve ter 11 ou 14 números'
     
     const phoneDigitCount = form.telefone.replace(/\D/g, '').length
-    if (phoneDigitCount !== 11) e.telefone = 'O telefone deve ter exatamente 11 números (com DDD)'
+    if (phoneDigitCount > 0 && phoneDigitCount !== 10 && phoneDigitCount !== 11) e.telefone = 'O telefone deve ter 10 ou 11 números'
     
     if (!form.cidade.trim())   e.cidade     = 'Campo obrigatório'
     if (!form.produto.trim())  e.produto    = 'Campo obrigatório'
