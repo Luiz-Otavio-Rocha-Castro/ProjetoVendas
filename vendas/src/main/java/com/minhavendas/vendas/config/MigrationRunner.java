@@ -48,11 +48,13 @@ public class MigrationRunner implements CommandLineRunner {
         }
 
         try {
-            jdbcTemplate.execute("UPDATE cliente SET tenant_id = 1 WHERE tenant_id IS NULL");
-            jdbcTemplate.execute("UPDATE venda SET tenant_id = 1 WHERE tenant_id IS NULL");
-            jdbcTemplate.execute("UPDATE visita SET tenant_id = 1 WHERE tenant_id IS NULL");
-            jdbcTemplate.execute("UPDATE documento SET tenant_id = 1 WHERE tenant_id IS NULL");
-            logger.info("Registros antigos atualizados para tenant_id = 1 com sucesso.");
+            // Inteligência para recuperar dados criados sem tenantId, 
+            // buscando o tenant_id do vendedor dono do registro.
+            jdbcTemplate.execute("UPDATE cliente SET tenant_id = (SELECT tenant_id FROM vendedor WHERE vendedor.id = cliente.vendedor_id) WHERE tenant_id IS NULL");
+            jdbcTemplate.execute("UPDATE venda SET tenant_id = (SELECT tenant_id FROM vendedor WHERE vendedor.id = venda.vendedor_id) WHERE tenant_id IS NULL");
+            jdbcTemplate.execute("UPDATE visita SET tenant_id = (SELECT tenant_id FROM vendedor WHERE vendedor.id = visita.vendedor_id) WHERE tenant_id IS NULL");
+            jdbcTemplate.execute("UPDATE documento SET tenant_id = (SELECT tenant_id FROM vendedor WHERE vendedor.id = documento.vendedor_id) WHERE tenant_id IS NULL");
+            logger.info("Registros com tenant_id null foram recuperados com sucesso baseados no vendedor dono!");
         } catch (Exception e) {
             logger.error("Erro ao rodar migração de dados no BD: " + e.getMessage());
         }
