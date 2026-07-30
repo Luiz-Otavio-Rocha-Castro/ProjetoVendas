@@ -69,9 +69,22 @@ public class OnboardingService {
         validarRequest(request);
 
         // Verifica unicidade do e-mail antes de criar qualquer registro
-        if (vendedorRepository.findByEmail(request.getEmail().trim().toLowerCase()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Este e-mail já está cadastrado no sistema.");
+        java.util.Optional<Vendedor> existente = vendedorRepository.findByEmail(request.getEmail().trim().toLowerCase());
+        if (existente.isPresent()) {
+            Vendedor v = existente.get();
+            // Se o e-mail ja foi verificado, bloqueia o cadastro.
+            if (v.getEmailVerificado() != null && v.getEmailVerificado()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Este e-mail jA estA cadastrado e ativo no sistema.");
+            } else {
+                // Se nao foi verificado, o usuario provavelmente perdeu o link ou deu erro antes.
+                // Resetamos a tentativa deletando a conta "morta" e o tenant dela.
+                logger.info("Deletando conta nao verificada antiga para permitir nova tentativa: {}", v.getEmail());
+                vendedorRepository.delete(v);
+                if (v.getTenantId() != null) {
+                    tenantRepository.deleteById(v.getTenantId());
+                }
+            }
         }
 
         // --- ETAPA 1: Criar o Tenant (Empresa) ---
