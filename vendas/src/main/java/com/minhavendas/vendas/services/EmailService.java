@@ -69,7 +69,7 @@ public class EmailService {
             // HTML simples, ideal seria um template externo, mas mantemos coeso aqui
             String htmlContent = String.format(
                 "<h2>Olá, %s!</h2>" +
-                "<p>Obrigado por se cadastrar no Minhas Vendas.</p>" +
+                "<p>Obrigado por se cadastrar na <b>Solvy</b>.</p>" +
                 "<p>Para ativar sua conta e acessar o painel, clique no botão abaixo:</p>" +
                 "<a href='%s' style='background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;'>Verificar E-mail</a>" +
                 "<p>Se o botão não funcionar, copie e cole o link no seu navegador:</p>" +
