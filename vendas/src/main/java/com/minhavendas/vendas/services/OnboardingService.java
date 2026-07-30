@@ -78,12 +78,35 @@ public class OnboardingService {
                         "Este e-mail jA estA cadastrado e ativo no sistema.");
             } else {
                 // Se nao foi verificado, o usuario provavelmente perdeu o link ou deu erro antes.
-                // Resetamos a tentativa deletando a conta "morta" e o tenant dela.
-                logger.info("Deletando conta nao verificada antiga para permitir nova tentativa: {}", v.getEmail());
-                vendedorRepository.delete(v);
-                if (v.getTenantId() != null) {
-                    tenantRepository.deleteById(v.getTenantId());
-                }
+                // Ao inves de deletar (o que causa erro 500 no banco por conflito de transacao), nos ATUALIZAMOS a conta.
+                logger.info("Atualizando conta nao verificada antiga para nova tentativa: {}", v.getEmail());
+                
+                v.setNome(request.getNomeVendedor().trim());
+                v.setSenha(passwordEncoder.encode(request.getSenha()));
+                v.setRegiaoAtuacao(request.getRegiaoAtuacao());
+                
+                String token = java.util.UUID.randomUUID().toString();
+                v.setTokenVerificacao(token);
+                v.setDataExpiracaoToken(java.time.LocalDateTime.now().plusHours(24));
+                vendedorRepository.save(v);
+                
+                Tenant t = tenantRepository.findById(v.getTenantId()).orElse(new Tenant());
+                t.setNomeEmpresa(request.getNomeEmpresa().trim());
+                t.setCnpj(request.getCnpj());
+                t.setSubscriptionStatus(SubscriptionService.STATUS_TRIAL);
+                tenantRepository.save(t);
+                
+                emailService.enviarEmailVerificacao(v.getEmail(), v.getNome(), token);
+                
+                OnboardingResponse response = new OnboardingResponse();
+                response.setTenantId(t.getId());
+                response.setNomeEmpresa(t.getNomeEmpresa());
+                response.setSubscriptionStatus(t.getSubscriptionStatus());
+                response.setVendedorId(v.getId());
+                response.setNomeVendedor(v.getNome());
+                response.setEmail(v.getEmail());
+                response.setMensagem("Cadastro realizado com sucesso! Verifique sua caixa de entrada (e spam) para ativar sua conta.");
+                return response;
             }
         }
 
