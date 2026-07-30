@@ -11,6 +11,7 @@ import NovoContratoModal from './NovoContratoModal'
 import ContratoSheet from './ContratoSheet'
 import type { Contrato, ContratoStatus } from './mockVendas'
 import { api } from '../../services/api';
+import { useToast } from '../../contexts/ToastContext';
 
 const STATUS_STYLE: Record<ContratoStatus, { color: string; bg: string; border: string; dot: string; label: string }> = {
   Aprovado:        { color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0',               dot: '#16A34A', label: 'Aprovado' },
@@ -35,6 +36,7 @@ const cardBase: React.CSSProperties = {
 }
 
 export default function VendasPage() {
+  const { toast } = useToast()
   const {
     itensPagina, filtrados, busca, setBusca,
     mesReferencia, setMesReferencia, pagina, setPagina,
@@ -75,19 +77,24 @@ export default function VendasPage() {
     setConfirmDelete(id)
   }
 
-  const confirmarRemocao = () => {
+  const confirmarRemocao = async () => {
     if (confirmDelete) {
-      removerContrato(confirmDelete)
+      const success = await removerContrato(confirmDelete)
+      if (success) {
+        toast({ title: 'Sucesso', message: 'Contrato removido com sucesso!', type: 'success' })
+      }
       if (sheetContrato?.id === confirmDelete) setSheetContrato(null)
     }
     setConfirmDelete(null)
   }
 
-  const handleSave = (dados: Omit<Contrato, 'id'>) => {
+  const handleSave = async (dados: Omit<Contrato, 'id'>) => {
     if (editContrato) {
-      editarContrato(editContrato.id, dados)
+      const success = await editarContrato(editContrato.id, dados)
+      if (success) toast({ title: 'Sucesso', message: 'Contrato atualizado com sucesso!', type: 'success' })
     } else {
-      adicionarContrato(dados)
+      const success = await adicionarContrato(dados)
+      if (success) toast({ title: 'Sucesso', message: 'Contrato salvo com sucesso!', type: 'success' })
     }
     setEditContrato(null)
     setModalOpen(false)

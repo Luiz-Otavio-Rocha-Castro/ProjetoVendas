@@ -17,6 +17,8 @@ public class VendaRequest {
     
     private String formaPagamento;
 
+    private java.time.LocalDate dataVenda;
+
     //#endregion
 
     //#region gets e setts
@@ -74,6 +76,14 @@ public class VendaRequest {
 
     public void setSaldoDevedor(Double saldoDevedor) {
         this.saldoDevedor = saldoDevedor;
+    }
+
+    public java.time.LocalDate getDataVenda() {
+        return dataVenda;
+    }
+
+    public void setDataVenda(java.time.LocalDate dataVenda) {
+        this.dataVenda = dataVenda;
     }
 
     //#endregion
