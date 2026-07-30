@@ -30,8 +30,9 @@ public class AuthService {
 
     public AcessDTO login(AuthenticationDTO authDto){
         // Verifica o e-mail antes de autenticar para dar uma mensagem clara
-        com.minhavendas.vendas.model.Vendedor vendedor = vendedorRepository.findByEmail(authDto.getEmail())
-            .orElseThrow(() -> new BadCredentialsException("Usuário não encontrado."));
+        com.minhavendas.vendas.model.Vendedor vendedor = vendedorRepository.findFirstByEmail(authDto.getEmail())
+            .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.UNAUTHORIZED, "Usuário não encontrado."));
 
         if (Boolean.FALSE.equals(vendedor.getEmailVerificado())) {
             throw new org.springframework.web.server.ResponseStatusException(
@@ -46,7 +47,13 @@ public class AuthService {
 
         // 2. A MÁGICA ACONTECE AQUI: O authenticationManager pega o 'crachá temporário', vai até o banco de dados
         // compara a senha criptografada do banco com a senha que o React enviou e vê se batem.
-        Authentication authentication = authenticationManager.authenticate(userAuth);    
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(userAuth);
+        } catch (org.springframework.security.core.AuthenticationException e) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.UNAUTHORIZED, "Senha incorreta.");
+        }   
 
         // 3. Se chegou nesta linha, a senha estava correta! Pegamos os detalhes do usuário logado.
         VendedorDetails userAuthenticate = (VendedorDetails)authentication.getPrincipal();

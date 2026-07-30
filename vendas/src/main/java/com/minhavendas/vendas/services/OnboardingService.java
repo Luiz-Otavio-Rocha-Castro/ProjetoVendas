@@ -69,7 +69,7 @@ public class OnboardingService {
         validarRequest(request);
 
         // Verifica unicidade do e-mail antes de criar qualquer registro
-        java.util.Optional<Vendedor> existente = vendedorRepository.findByEmail(request.getEmail().trim().toLowerCase());
+        java.util.Optional<Vendedor> existente = vendedorRepository.findFirstByEmail(request.getEmail().trim().toLowerCase());
         if (existente.isPresent()) {
             Vendedor v = existente.get();
             // Se o e-mail ja foi verificado, bloqueia o cadastro.

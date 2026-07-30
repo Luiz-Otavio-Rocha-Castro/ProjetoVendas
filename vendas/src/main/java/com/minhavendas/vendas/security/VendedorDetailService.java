@@ -17,7 +17,7 @@ public class VendedorDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Vendedor vendedor = vendedorRepository.findByEmail(username).get();
+        Vendedor vendedor = vendedorRepository.findFirstByEmail(username).get();
         return VendedorDetails.build(vendedor);
     }
     
