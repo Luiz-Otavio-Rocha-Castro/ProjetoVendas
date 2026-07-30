@@ -219,7 +219,7 @@ export default function NovoContratoModal({ open, onClose, onSave, initialData, 
               />
             </div>
             <Input
-              label="CPF *"
+              label="CPF (Opcional)"
               placeholder="000.000.000-00"
               value={form.cpfCnpj}
               onChange={(e) => set('cpfCnpj', formatCPF(e.target.value))}
@@ -228,7 +228,7 @@ export default function NovoContratoModal({ open, onClose, onSave, initialData, 
               style={camposClienteBloqueados ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
             />
             <Input
-              label="Telefone *"
+              label="Telefone (Opcional)"
               placeholder="(00) 90000-0000"
               value={form.telefone}
               onChange={(e) => set('telefone', formatPhone(e.target.value))}
