@@ -64,7 +64,9 @@ public class VendaService {
         validarRegrasDeNegocioVenda(vendaDto);
 
         vendaDto.setId(null);
-        vendaDto.setDataVenda(LocalDate.now());
+        if (vendaDto.getDataVenda() == null) {
+            vendaDto.setDataVenda(LocalDate.now());
+        }
         vendaDto.setValorComissao(vendaDto.getValorTotal() * (vendaDto.getPercentualComissao() / 100));
         
         Venda venda = mapper.map(vendaDto, Venda.class);
@@ -91,7 +93,9 @@ public class VendaService {
         validarRegrasDeNegocioVenda(vendaDto);
 
         vendaDto.setId(id);
-        vendaDto.setDataVenda(vendaExistente.getDataVenda());
+        if (vendaDto.getDataVenda() == null) {
+            vendaDto.setDataVenda(vendaExistente.getDataVenda());
+        }
         vendaDto.setValorComissao(vendaDto.getValorTotal() * (vendaDto.getPercentualComissao() / 100));
         
         Venda venda = mapper.map(vendaDto, Venda.class);

@@ -25,6 +25,7 @@ interface VendaRequestJava {
   valorTotal: number;
   percentualComissao: number;
   formaPagamento: string;
+  dataVenda?: string;
 }
 
 interface ClienteResponse{
@@ -107,7 +108,7 @@ export async function obterVendas(): Promise<Contrato[]> {
 }
 
 // Função para cadastrar uma nova venda via POST
-export async function cadastrarVenda(dados: Omit<Contrato, 'id' | 'dataCriacao'>): Promise<Contrato> {
+export async function cadastrarVenda(dados: Omit<Contrato, 'id'>): Promise<Contrato> {
   // Prepara o payload no formato que o backend (CadastroCompleto) espera
   const requestPayload: CadastroCompletoRequestJava = {
     cliente: {
@@ -124,6 +125,7 @@ export async function cadastrarVenda(dados: Omit<Contrato, 'id' | 'dataCriacao'>
       valorTotal: dados.valorTotal,
       percentualComissao: dados.valorTotal > 0 ? (dados.comissao / dados.valorTotal) * 100 : 5,
       formaPagamento: dados.financiamento,
+      dataVenda: (dados as any).dataCriacao
     }
   };
 
@@ -174,7 +176,8 @@ export async function atualizarVenda(idDoContrato: number, dados: any): Promise<
       saldoDevedor: dados.saldoDevedor,
       valorTotal: dados.valorTotal,
       percentualComissao: dados.valorTotal > 0 ? (dados.comissao / dados.valorTotal) * 100 : 5,
-      formaPagamento: dados.financiamento
+      formaPagamento: dados.financiamento,
+      dataVenda: dados.dataCriacao
     }
   };
 

@@ -7,13 +7,14 @@ import Button from '../../components/ui/Button'
 import type { Contrato, ContratoStatus } from './mockVendas'
 import { CIDADES, STATUS_OPTIONS, mockContratos } from './mockVendas'
 
-type Dados = Omit<Contrato, 'id' | 'dataCriacao'>
+type Dados = Omit<Contrato, 'id'>
 
 const empty: Dados = {
   cliente: '', cpfCnpj: '', telefone: '', cidade: '',
   vendedor: 'Lucas Araújo', produto: '', kwp: 0, valorTotal: 0,
   comissao: 0, saldoDevedor: 0,
   status: 'Pendente', paineis: 0, financiamento: 'Financiado',
+  dataCriacao: new Date().toISOString().split('T')[0]
 }
 
 
@@ -298,6 +299,12 @@ export default function NovoContratoModal({ open, onClose, onSave, initialData, 
               value={form.status}
               onChange={(e) => set('status', e.target.value as ContratoStatus)}
               options={STATUS_OPTIONS.map((s) => ({ value: s, label: s }))}
+            />
+            <Input
+              label="Data da Venda"
+              type="date"
+              value={form.dataCriacao || ''}
+              onChange={(e) => set('dataCriacao', e.target.value)}
             />
           </div>
         </section>
