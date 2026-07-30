@@ -30,12 +30,25 @@ public class MigrationRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         logger.info("Executando MigrationRunner para atualizar tenant_id...");
-        if (tenantRepository.findById(1).isEmpty()) {
-            Tenant t = new Tenant();
-            t.setNomeEmpresa("Minha Empresa");
-            t.setSubscriptionStatus("ACTIVE");
-            tenantRepository.save(t);
-            logger.info("Criado Tenant padrão (ID 1).");
+        
+        Integer defaultTenantId = 1;
+        try {
+            if (tenantRepository.findAll().isEmpty()) {
+                Tenant t = new Tenant();
+                t.setNomeEmpresa("Minha Empresa");
+                t.setSubscriptionStatus("ACTIVE");
+                t = tenantRepository.save(t);
+                defaultTenantId = t.getId();
+                logger.info("Criado Tenant padrão (ID " + defaultTenantId + ").");
+            } else {
+                // Se já existir tenants, pegamos o ID do primeiro para usar como fallback pros vendedores antigos
+                defaultTenantId = tenantRepository.findAll().get(0).getId();
+            }
+        } catch (Exception e) {
+            logger.warn("Não foi possível criar o Tenant padrão (possível duplicação). Pegando o primeiro disponível...");
+            if (!tenantRepository.findAll().isEmpty()) {
+                defaultTenantId = tenantRepository.findAll().get(0).getId();
+            }
         }
 
         List<Vendedor> semTenant = vendedorRepository.findAll().stream()
@@ -43,7 +56,7 @@ public class MigrationRunner implements CommandLineRunner {
             .collect(Collectors.toList());
             
         for(Vendedor v : semTenant) {
-            v.setTenantId(1);
+            v.setTenantId(defaultTenantId);
             vendedorRepository.save(v);
         }
 
