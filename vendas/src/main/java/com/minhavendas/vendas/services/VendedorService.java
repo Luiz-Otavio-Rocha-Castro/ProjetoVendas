@@ -63,7 +63,7 @@ public class VendedorService {
         com.minhavendas.vendas.util.EmailValidator.validarOuLancarErro(vendedorDTO.getEmail());
 
         // Verifica se o e-mail já está em uso
-        if (vendedorRepository.findByEmail(vendedorDTO.getEmail().trim().toLowerCase()).isPresent()) {
+        if (vendedorRepository.findFirstByEmail(vendedorDTO.getEmail().trim().toLowerCase()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Este e-mail já está cadastrado.");
         }
 
