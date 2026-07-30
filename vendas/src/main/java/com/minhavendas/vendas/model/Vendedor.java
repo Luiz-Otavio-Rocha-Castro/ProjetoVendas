@@ -15,6 +15,7 @@ public class Vendedor {
 
     private String nome;
 
+    @jakarta.persistence.Column(unique = true)
     private String email;
 
     private String senha;
