@@ -62,7 +62,7 @@ public class EmailService {
             
             // Corpo da requisição para o Resend
             Map<String, Object> body = new HashMap<>();
-            body.put("from", "Minhas Vendas <onboarding@resend.dev>"); // Dominio de testes do Resend
+            body.put("from", "Equipe Solvy <contato@solvyapp.online>"); // Dominio oficial!
             body.put("to", List.of(emailDestino));
             body.put("subject", "Bem-vindo! Verifique seu e-mail");
             
