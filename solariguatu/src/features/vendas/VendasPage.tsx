@@ -81,7 +81,7 @@ export default function VendasPage() {
     if (confirmDelete) {
       const success = await removerContrato(confirmDelete)
       if (success) {
-        toast({ title: 'Sucesso', message: 'Contrato removido com sucesso!', type: 'success' })
+        toast('success', 'Sucesso', 'Contrato removido com sucesso!')
       }
       if (sheetContrato?.id === confirmDelete) setSheetContrato(null)
     }
@@ -91,10 +91,10 @@ export default function VendasPage() {
   const handleSave = async (dados: Omit<Contrato, 'id'>) => {
     if (editContrato) {
       const success = await editarContrato(editContrato.id, dados)
-      if (success) toast({ title: 'Sucesso', message: 'Contrato atualizado com sucesso!', type: 'success' })
+      if (success) toast('success', 'Sucesso', 'Contrato atualizado com sucesso!')
     } else {
       const success = await adicionarContrato(dados)
-      if (success) toast({ title: 'Sucesso', message: 'Contrato salvo com sucesso!', type: 'success' })
+      if (success) toast('success', 'Sucesso', 'Contrato salvo com sucesso!')
     }
     setEditContrato(null)
     setModalOpen(false)
