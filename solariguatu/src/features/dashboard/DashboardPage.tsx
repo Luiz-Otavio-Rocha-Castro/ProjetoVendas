@@ -203,7 +203,7 @@ export default function DashboardPage() {
     doc.setTextColor(...AMBER)
     doc.setFontSize(18)
     doc.setFont('helvetica', 'bold')
-    doc.text('SolarIguatu', MARGIN, 15)
+    doc.text('Solvy', MARGIN, 15)
 
     doc.setTextColor(...WHITE)
     doc.setFontSize(9)
@@ -398,7 +398,7 @@ export default function DashboardPage() {
     doc.setTextColor(...GRAY)
     doc.setFontSize(7)
     doc.setFont('helvetica', 'italic')
-    doc.text('SolarIguatu — Documento gerado automaticamente pelo sistema de gestão de vendas.', MARGIN, footerY + 5)
+    doc.text('Solvy — Documento gerado automaticamente pelo sistema de gestão de vendas.', MARGIN, footerY + 5)
     doc.text(`Página 1/1`, PAGE_W - MARGIN, footerY + 5, { align: 'right' })
 
     const fileName = `relatorio-${monthString.toLowerCase().replace(' ', '-')}-${user?.name?.split(' ')[0]?.toLowerCase() ?? 'vendedor'}.pdf`

@@ -47,8 +47,7 @@ export default function Modal({ open, onClose, title, subtitle, children, width 
           background: 'var(--color-background)',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* Logo small */}
-            <img src="/logo.jpg" alt="SolarIguatu" style={{ height: '28px', objectFit: 'contain' }} />
+            {/* Logo removed for multi-tenant support */}
             <div>
               <h2 style={{
                 fontSize: '0.975rem', fontWeight: 700, margin: 0,

@@ -135,17 +135,7 @@ export default function ContratoSheet({ contrato, onClose }: Props) {
               position: 'relative',
               overflow: 'hidden',
             }}>
-              {/* Logo pequena (decorativa) */}
-              <img
-                src="/logo.jpg"
-                alt=""
-                style={{
-                  position: 'absolute', right: '16px', top: '50%',
-                  transform: 'translateY(-50%)',
-                  height: '44px', opacity: 0.15,
-                  pointerEvents: 'none', userSelect: 'none',
-                }}
-              />
+              {/* Logo removed for multi-tenant support */}
 
               {/* Close button */}
               <button
