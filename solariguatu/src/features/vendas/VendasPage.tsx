@@ -83,7 +83,7 @@ export default function VendasPage() {
     setConfirmDelete(null)
   }
 
-  const handleSave = (dados: Omit<Contrato, 'id' | 'dataCriacao'>) => {
+  const handleSave = (dados: Omit<Contrato, 'id'>) => {
     if (editContrato) {
       editarContrato(editContrato.id, dados)
     } else {

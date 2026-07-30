@@ -76,7 +76,7 @@ export function useVendas() {
     [contratosPendentes]
   )
 
-  const adicionarContrato = useCallback(async (dados: Omit<Contrato, 'id' | 'dataCriacao'>): Promise<boolean> => {
+  const adicionarContrato = useCallback(async (dados: Omit<Contrato, 'id'>): Promise<boolean> => {
     if (isMutating) return false;
     setIsMutating(true);
     try {
