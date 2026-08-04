@@ -298,7 +298,7 @@ export default function ContratoSheet({ contrato, onClose }: Props) {
                   <InfoRow icon={<Package size={13} />} label="Produto" value={contrato.produto} />
                   <InfoRow icon={<TrendingUp size={13} />} label="Potência" value={`${contrato.kwp} kWp`} />
                   <InfoRow icon={<Package size={13} />} label="Painéis" value={`${contrato.paineis} unidades`} />
-                  <InfoRow icon={<CreditCard size={13} />} label="Financiamento" value={contrato.financiamento} />
+                  <InfoRow icon={<CreditCard size={13} />} label="Forma de Pagamento" value={contrato.financiamento} />
                   <InfoRow icon={<Calendar size={13} />} label="Data" value={fmtDate(contrato.dataCriacao)} />
                 </div>
               </section>

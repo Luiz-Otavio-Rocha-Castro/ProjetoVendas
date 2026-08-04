@@ -285,13 +285,15 @@ export default function NovoContratoModal({ open, onClose, onSave, initialData, 
               error={errors.paineis}
             />
             <Select
-              label="Financiamento"
+              label="Forma de Pagamento"
               value={form.financiamento}
               onChange={(e) => set('financiamento', e.target.value as Contrato['financiamento'])}
               options={[
                 { value: 'Financiado', label: 'Financiado' },
-                { value: 'À Vista',    label: 'À Vista' },
-                { value: 'BNDES',      label: 'BNDES' },
+                { value: 'Pix',        label: 'Pix' },
+                { value: 'Dinheiro',   label: 'Dinheiro' },
+                { value: 'Cartão',     label: 'Cartão' },
+                { value: 'Boleto',     label: 'Boleto' },
               ]}
             />
             <Select
