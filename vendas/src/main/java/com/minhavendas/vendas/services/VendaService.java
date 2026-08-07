@@ -67,46 +67,89 @@ public class VendaService {
         if (vendaDto.getDataVenda() == null) {
             vendaDto.setDataVenda(LocalDate.now());
         }
-        vendaDto.setValorComissao(vendaDto.getValorTotal() * (vendaDto.getPercentualComissao() / 100));
         
         Venda venda = mapper.map(vendaDto, Venda.class);
         venda.setCliente(cliente);
         venda.setVendedorId(vendedorId);
+        venda.setPercentualComissao(0.0);
+        venda.setValorComissao(0.0);
         
         venda = vendaRepository.save(venda);
-        vendaDto.setId(venda.getId());
+        vendaRepository.flush();
         
-        return vendaDto;
+        recalcularComissoesDoMes(vendedorId, venda.getDataVenda());
+        
+        venda = vendaRepository.findById(venda.getId()).get();
+        return mapper.map(venda, VendaDTO.class);
     }
 
     @Transactional
     public void deletar(Integer id) {
         Venda venda = buscarVendaValidandoDono(id);
         vendaRepository.delete(venda);
+        vendaRepository.flush();
+        recalcularComissoesDoMes(venda.getVendedorId(), venda.getDataVenda());
     }
 
     @Transactional
     public VendaDTO atualizar(VendaDTO vendaDto, Integer id, Integer clienteId) {
         Venda vendaExistente = buscarVendaValidandoDono(id);
+        LocalDate dataAntiga = vendaExistente.getDataVenda();
         Cliente cliente = buscarClienteOuLancarErro(clienteId);
         
         validarRegrasDeNegocioVenda(vendaDto);
 
         vendaDto.setId(id);
         if (vendaDto.getDataVenda() == null) {
-            vendaDto.setDataVenda(vendaExistente.getDataVenda());
+            vendaDto.setDataVenda(dataAntiga);
         }
-        vendaDto.setValorComissao(vendaDto.getValorTotal() * (vendaDto.getPercentualComissao() / 100));
         
         Venda venda = mapper.map(vendaDto, Venda.class);
         venda.setCliente(cliente);
         venda.setVendedorId(vendaExistente.getVendedorId());
+        venda.setPercentualComissao(vendaExistente.getPercentualComissao());
+        venda.setValorComissao(vendaExistente.getValorComissao());
         
-        vendaRepository.save(venda);
-        return vendaDto;
+        venda = vendaRepository.save(venda);
+        vendaRepository.flush();
+        
+        recalcularComissoesDoMes(venda.getVendedorId(), venda.getDataVenda());
+        
+        if (dataAntiga != null && (!dataAntiga.getMonth().equals(venda.getDataVenda().getMonth()) || dataAntiga.getYear() != venda.getDataVenda().getYear())) {
+            recalcularComissoesDoMes(venda.getVendedorId(), dataAntiga);
+        }
+        
+        venda = vendaRepository.findById(venda.getId()).get();
+        return mapper.map(venda, VendaDTO.class);
     }
 
     /* --- MÉTODOS PRIVADOS DE APOIO --- */
+
+    private void recalcularComissoesDoMes(Integer vendedorId, LocalDate dataVenda) {
+        if (vendedorId == null || dataVenda == null) return;
+        
+        LocalDate inicioMes = dataVenda.withDayOfMonth(1);
+        LocalDate fimMes = dataVenda.withDayOfMonth(dataVenda.lengthOfMonth());
+        
+        Double totalMes = vendaRepository.sumValorTotalElegivelByVendedorIdAndDataVendaBetween(vendedorId, inicioMes, fimMes);
+        if (totalMes == null) totalMes = 0.0;
+        
+        Double novoPercentual = calcularPercentualComissao(totalMes);
+        
+        List<Venda> vendasDoMes = vendaRepository.findElegiveisByVendedorIdAndDataVendaBetween(vendedorId, inicioMes, fimMes);
+        for (Venda v : vendasDoMes) {
+            v.setPercentualComissao(novoPercentual);
+            v.setValorComissao(v.getValorTotal() * (novoPercentual / 100.0));
+            vendaRepository.save(v);
+        }
+    }
+
+    private Double calcularPercentualComissao(Double totalVendas) {
+        if (totalVendas <= 99999.99) return 5.0;
+        if (totalVendas <= 149999.99) return 6.0;
+        if (totalVendas <= 199999.99) return 6.5;
+        return 7.0;
+    }
 
     private Integer getVendedorLogadoSeguro() {
         Integer id = SecurityUtils.getVendedorIdLogado();
@@ -136,9 +179,7 @@ public class VendaService {
         if (vendaDto.getValorTotal() == null || vendaDto.getValorTotal() <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O valor total da venda deve ser maior que zero.");
         }
-        if (vendaDto.getPercentualComissao() == null || vendaDto.getPercentualComissao() < 0 || vendaDto.getPercentualComissao() > 100) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O percentual de comissão deve estar entre 0 e 100.");
-        }
+        // Validação de percentual removida, pois será recalculado.
     }
 }
 

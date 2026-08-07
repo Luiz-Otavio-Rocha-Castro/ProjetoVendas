@@ -33,7 +33,6 @@ export default function NovoContratoModal({ open, onClose, onSave, initialData, 
   const [errors, setErrors] = useState<Partial<Record<keyof Dados, string>>>({})
   const [saving, setSaving] = useState(false)
   const [clienteSelecionado, setClienteSelecionado] = useState<string>('') // cpfCnpj do cliente
-  const [comissaoPct, setComissaoPct] = useState<number | string>(5) // default 5%
 
   // Lista de clientes únicos a partir da prop contratos (dados reais do sistema)
   const clientesExistentes = Array.from(
@@ -44,15 +43,9 @@ export default function NovoContratoModal({ open, onClose, onSave, initialData, 
   useEffect(() => {
     if (open && initialData) {
       setForm({ ...empty, ...initialData } as Dados)
-      if (initialData.valorTotal && initialData.valorTotal > 0 && initialData.comissao !== undefined) {
-        setComissaoPct((initialData.comissao / initialData.valorTotal) * 100)
-      } else {
-        setComissaoPct(5)
-      }
       setClienteSelecionado(initialData.cpfCnpj || '')
     } else if (open && !initialData) {
       setForm(empty)
-      setComissaoPct(5)
       setClienteSelecionado('')
     }
     setErrors({})
@@ -110,7 +103,6 @@ export default function NovoContratoModal({ open, onClose, onSave, initialData, 
     if (!form.cidade.trim())   e.cidade     = 'Campo obrigatório'
     if (!form.produto.trim())  e.produto    = 'Campo obrigatório'
     if (form.valorTotal <= 0)  e.valorTotal  = 'Valor deve ser maior que 0'
-    if (Number(comissaoPct) < 0) e.comissao   = 'Comissão não pode ser negativa'
     if (form.paineis <= 0)     e.paineis    = 'Informe a quantidade de painéis'
     if (form.status === 'Pendente' && form.saldoDevedor <= 0)
       e.saldoDevedor = 'Informe o saldo devedor para contratos Pendentes'
@@ -123,11 +115,9 @@ export default function NovoContratoModal({ open, onClose, onSave, initialData, 
     if (!validate()) return
     setSaving(true)
     await new Promise((r) => setTimeout(r, 600))
-    // Calcula a comissão em R$ a partir da porcentagem e zera saldo devedor se não for Pendente
-    const finalComissao = (Number(comissaoPct) / 100) * form.valorTotal
     onSave({
       ...form,
-      comissao: finalComissao,
+      comissao: 0,
       saldoDevedor: form.status === 'Pendente' ? form.saldoDevedor : 0
     })
     setSaving(false)
@@ -329,14 +319,11 @@ export default function NovoContratoModal({ open, onClose, onSave, initialData, 
               error={errors.valorTotal}
             />
             <Input
-              label="Comissão do Vendedor (%) *"
-              type="number"
-              placeholder="Ex: 5"
-              min={0}
-              step={0.1}
-              value={comissaoPct}
-              onChange={(e) => setComissaoPct(e.target.value)}
-              error={errors.comissao}
+              label="Comissão do Vendedor"
+              type="text"
+              value="Calculada automaticamente"
+              disabled
+              readOnly
             />
             {form.status === 'Pendente' && (
               <div className="sm:col-span-2">

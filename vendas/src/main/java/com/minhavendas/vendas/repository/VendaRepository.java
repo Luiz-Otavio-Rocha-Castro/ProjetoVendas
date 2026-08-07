@@ -20,4 +20,10 @@ public interface VendaRepository extends JpaRepository<Venda, Integer>{
 
     @org.springframework.data.jpa.repository.Query("SELECT COUNT(v) FROM Venda v WHERE (v.vendedorId = :vendedorId OR v.vendedorId IS NULL) AND v.dataVenda BETWEEN :inicio AND :fim")
     Integer countByVendedorIdAndDataVendaBetween(@org.springframework.data.repository.query.Param("vendedorId") Integer vendedorId, @org.springframework.data.repository.query.Param("inicio") java.time.LocalDate inicio, @org.springframework.data.repository.query.Param("fim") java.time.LocalDate fim);
+
+    @org.springframework.data.jpa.repository.Query("SELECT SUM(v.valorTotal) FROM Venda v WHERE (v.vendedorId = :vendedorId OR v.vendedorId IS NULL) AND (v.status IS NULL OR v.status != 'Cancelado') AND v.dataVenda BETWEEN :inicio AND :fim")
+    Double sumValorTotalElegivelByVendedorIdAndDataVendaBetween(@org.springframework.data.repository.query.Param("vendedorId") Integer vendedorId, @org.springframework.data.repository.query.Param("inicio") java.time.LocalDate inicio, @org.springframework.data.repository.query.Param("fim") java.time.LocalDate fim);
+
+    @org.springframework.data.jpa.repository.Query("SELECT v FROM Venda v WHERE (v.vendedorId = :vendedorId OR v.vendedorId IS NULL) AND (v.status IS NULL OR v.status != 'Cancelado') AND v.dataVenda BETWEEN :inicio AND :fim")
+    List<Venda> findElegiveisByVendedorIdAndDataVendaBetween(@org.springframework.data.repository.query.Param("vendedorId") Integer vendedorId, @org.springframework.data.repository.query.Param("inicio") java.time.LocalDate inicio, @org.springframework.data.repository.query.Param("fim") java.time.LocalDate fim);
 }
