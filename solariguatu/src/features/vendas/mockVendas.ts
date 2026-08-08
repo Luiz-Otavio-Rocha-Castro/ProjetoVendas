@@ -11,6 +11,7 @@ export interface Contrato {
   kwp: number
   valorTotal: number
   comissao: number       // valor em R$ informado pelo vendedor
+  percentualComissao?: number // Porcentagem aplicada
   saldoDevedor: number   // quanto o cliente ainda deve (0 se não for Pendente)
   status: ContratoStatus
   dataCriacao: string

@@ -9,26 +9,22 @@ export function useVendas() {
   const [isMutating, setIsMutating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    let isMounted = true;
+  const carregarContratos = useCallback(async () => {
     setIsLoading(true);
-    
-    obterVendas()
-      .then((dadosReais) => {
-        if (isMounted) setContratos(dadosReais);
-      })
-      .catch((erro) => {
-        if (isMounted) {
-          console.error("Erro ao carregar contratos:", erro);
-          setError("Falha ao carregar vendas da API.");
-        }
-      })
-      .finally(() => {
-        if (isMounted) setIsLoading(false);
-      });
+    try {
+      const dadosReais = await obterVendas();
+      setContratos(dadosReais);
+    } catch (erro) {
+      console.error("Erro ao carregar contratos:", erro);
+      setError("Falha ao carregar vendas da API.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-    return () => { isMounted = false; };
-  }, [])
+  useEffect(() => {
+    carregarContratos();
+  }, [carregarContratos])
 
   const [busca, setBusca] = useState('')
   const [mesReferencia, setMesReferencia] = useState<Date>(new Date())
@@ -80,8 +76,8 @@ export function useVendas() {
     if (isMutating) return false;
     setIsMutating(true);
     try {
-      const novo = await cadastrarVenda(dados)
-      setContratos((prev) => [novo, ...prev])
+      await cadastrarVenda(dados)
+      await carregarContratos()
       setPagina(1)
       return true;
     } catch (erro) {
@@ -99,7 +95,7 @@ export function useVendas() {
     try {
       const idNumerico = parseInt(id.replace(/\D/g, ''), 10);
       await deletarVenda(idNumerico);
-      setContratos((prev) => prev.filter((c) => c.id !== id))
+      await carregarContratos()
       return true;
     } catch (erro) {
       console.error("Erro ao deletar contrato:", erro);
@@ -110,15 +106,13 @@ export function useVendas() {
     }
   }, [isMutating])
 
-  const editarContrato = useCallback(async (id: string, dados: Omit<Contrato, 'id' | 'dataCriacao'>): Promise<boolean> => {
+  const editarContrato = useCallback(async (id: string, dados: Omit<Contrato, 'id'>): Promise<boolean> => {
     if (isMutating) return false;
     setIsMutating(true);
     try {
       const idNumerico = parseInt(id.replace(/\D/g, ''), 10);
-      const atualizado = await atualizarVenda(idNumerico, dados);
-      setContratos((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, ...atualizado } : c))
-      )
+      await atualizarVenda(idNumerico, dados);
+      await carregarContratos()
       return true;
     } catch (erro) {
       console.error("Erro ao atualizar contrato:", erro);

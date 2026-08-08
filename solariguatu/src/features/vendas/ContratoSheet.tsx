@@ -234,7 +234,7 @@ export default function ContratoSheet({ contrato, onClose }: Props) {
                   fontFamily: 'var(--font-display)', color: 'var(--color-success)',
                   letterSpacing: '-0.02em',
                 }}>
-                  {fmtCurrency(contrato.comissao)}
+                  {fmtCurrency(contrato.comissao)} {contrato.percentualComissao ? `(${contrato.percentualComissao}%)` : ''}
                 </p>
               </div>
             </div>
@@ -315,7 +315,7 @@ export default function ContratoSheet({ contrato, onClose }: Props) {
                   <InfoRow
                     icon={<TrendingUp size={13} />}
                     label="Comissão do Vendedor"
-                    value={fmtCurrency(contrato.comissao)}
+                    value={`${fmtCurrency(contrato.comissao)} ${contrato.percentualComissao ? `(${contrato.percentualComissao}%)` : ''}`}
                     valueColor="var(--color-success)"
                   />
                   {contrato.status === 'Pendente' && (

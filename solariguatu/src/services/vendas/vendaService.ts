@@ -94,6 +94,7 @@ export async function obterVendas(): Promise<Contrato[]> {
       kwp: (contrato.venda.quantidadePainel || 0) * 0.55,
       valorTotal: contrato.venda.valorTotal,
       comissao: contrato.venda.valorComissao || ((contrato.venda.percentualComissao || 0) * (contrato.venda.valorTotal || 0) / 100) || 0,
+      percentualComissao: contrato.venda.percentualComissao,
       saldoDevedor: contrato.venda.saldoDevedor || 0,
       // Garante que o status do Java (ex: 'APROVADO') bata com o esperado pelo React (ex: 'Aprovado')
       status: normalizarStatus(contrato.venda.status),
@@ -201,6 +202,7 @@ export async function atualizarVenda(idDoContrato: number, dados: any): Promise<
       kwp: dados.kwp,
       valorTotal: vendaSalva.valorTotal || dados.valorTotal,
       comissao: vendaSalva.valorComissao || dados.comissao,
+      percentualComissao: vendaSalva.percentualComissao,
       saldoDevedor: vendaSalva.saldoDevedor || dados.saldoDevedor,
       status: normalizarStatus(vendaSalva.status || dados.status),
       dataCriacao: vendaSalva.dataVenda || new Date().toISOString().split('T')[0],
